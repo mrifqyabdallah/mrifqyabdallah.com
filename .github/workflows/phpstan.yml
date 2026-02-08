@@ -23,5 +23,5 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Launch Larastan inspection
-        run: ./vendor/bin/larastan analyze
+      - name: Launch PHPStan inspection
+        run: ./vendor/bin/phpstan analyze
