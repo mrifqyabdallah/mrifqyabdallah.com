@@ -1,16 +1,16 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import {ExternalLinkIcon, GithubIcon, LinkedinIcon } from 'lucide-react';
+import { ExternalLinkIcon, GithubIcon, LinkedinIcon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import AppearanceToggleTab from "@/components/appearance-tabs";
+import AppearanceToggleTab from '@/components/appearance-tabs';
 import { Button } from '@/components/ui/button';
-import { dashboard, login, register } from '@/routes';
 import type { SharedData } from '@/types';
+import { dashboard, login, register } from '@/routes';
 
 type Website = {
-    title: string,
-    description?: string|null,
-    url: string,
-}
+    title: string;
+    description?: string | null;
+    url: string;
+};
 
 export default function Welcome({
     canRegister = true,
@@ -21,23 +21,23 @@ export default function Welcome({
     const websites: Website[] = [
         {
             title: 'European Mint',
-            url: 'https://europeanmint.com/'
+            url: 'https://europeanmint.com/',
         },
         {
             title: 'API FKIP UNS',
-            url: 'https://api.fkip.uns.ac.id/'
+            url: 'https://api.fkip.uns.ac.id/',
         },
         {
             title: 'Layanan FKIP UNS',
-            url: 'https://layanan.fkip.uns.ac.id/'
+            url: 'https://layanan.fkip.uns.ac.id/',
         },
         {
             title: 'Calon Guru PPG FKIP UNS',
-            url: 'https://cagur.fkip.uns.ac.id/'
+            url: 'https://cagur.fkip.uns.ac.id/',
         },
         {
             title: 'Valid PPG FKIP UNS',
-            url: 'https://valid.fkip.uns.ac.id/'
+            url: 'https://valid.fkip.uns.ac.id/',
         },
     ];
 
