@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,13 +31,17 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user instanceof User) {
+            $user->fill($request->validated());
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
         }
-
-        $request->user()->save();
 
         return to_route('profile.edit');
     }
@@ -48,9 +53,11 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        Auth::logout();
+        if ($user instanceof User) {
+            Auth::logout();
 
-        $user->delete();
+            $user->delete();
+        }
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
