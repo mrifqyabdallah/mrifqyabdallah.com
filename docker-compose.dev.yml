@@ -10,7 +10,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - ./docker/frankenphp/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - ./docker/frankenphp/Caddyfile.dev:/etc/frankenphp/Caddyfile:ro
     ports:
       - "80:80"
       - "443:443"

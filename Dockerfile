@@ -78,7 +78,7 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
 # Copy FrankenPHP/Caddy server config
-COPY docker/frankenphp/Caddyfile.prod /etc/caddy/Caddyfile
+COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
 # Use non-root user for security
 USER www-data
