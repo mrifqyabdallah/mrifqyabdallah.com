@@ -2,9 +2,7 @@
     admin off
 }
 
-# Caddy automatically issues a self-signed certificate for .local domains.
-# APP_HOST is passed in via the environment (e.g. foo.local).
-{$APP_HOST:mrifqyabdallah.local} {
+http://{$APP_HOST:mrifqyabdallah.local} {
     root * /app/public
     php_server
     file_server

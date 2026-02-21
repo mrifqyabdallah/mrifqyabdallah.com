@@ -28,6 +28,12 @@ The defaults in `.env.example` are ready for dev — you only need to run `php a
 
 ### 3. Start the containers
 
+If you're running a fresh install, first run composer install through a temporary container
+```bash
+docker run --rm -v $(pwd):/app -w /app composer:2 composer install
+```
+
+Then spin up the container
 ```bash
 cp docker-compose.dev.yml docker-compose.yml
 docker compose up
