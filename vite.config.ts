@@ -8,7 +8,7 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
-            ssr: 'resources/js/ssr.tsx',
+            // ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),
         react({
@@ -23,5 +23,13 @@ export default defineConfig({
     ],
     esbuild: {
         jsx: 'automatic',
+    },
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: process.env.APP_HOST ?? 'mrifqyabdallah.local',
+            port: 5173,
+        },
     },
 });

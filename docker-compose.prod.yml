@@ -1,0 +1,64 @@
+name: laravel-prod
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # FrankenPHP — Laravel application server (pre-built image, no volume mount)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: https://${APP_HOST}
+      APP_KEY: ${APP_KEY}
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-laravel}
+      DB_USERNAME: ${DB_USERNAME:-laravel}
+      DB_PASSWORD: ${DB_PASSWORD}
+      APP_HOST: ${APP_HOST}
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - caddy_data:/data # Persists Let's Encrypt certificates
+    networks:
+      - laravel
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-mrifqyabdallah}
+      POSTGRES_USER: ${DB_USERNAME:-laravel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-laravel}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laravel
+    restart: unless-stopped
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  caddy_data:

@@ -1,0 +1,52 @@
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker files (no need to copy into the image)
+Dockerfile
+docker-compose*.yml
+docker/
+
+# PHP dependencies (reinstalled during build)
+vendor/
+
+# Node dependencies (reinstalled during build)
+node_modules/
+
+# Laravel generated / runtime files (generated at runtime or by build step)
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+bootstrap/cache/
+
+# Built frontend assets (rebuilt during Docker build)
+public/build/
+public/hot
+
+# Environment files (never bake secrets into an image)
+.env
+.env.*
+!.env.example
+
+# Tests
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Docs & misc
+README.md
+*.md
+CHANGELOG
+LICENSE
+
+# OS
+.DS_Store
+Thumbs.db
