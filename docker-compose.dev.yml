@@ -6,7 +6,7 @@ services:
   # FrankenPHP — Laravel application server
   # ---------------------------------------------------------------------------
   app:
-    image: dunglas/frankenphp:latest-php8.5
+    image: dunglas/frankenphp:1-php8.5
     working_dir: /app
     volumes:
       - .:/app

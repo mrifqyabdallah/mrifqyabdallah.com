@@ -7,15 +7,15 @@ There are two compose files — one for dev, one for prod. Neither is committed 
 
 ---
 
-## Development (WSL + foo.local)
+## Development (WSL + mrifqyabdallah.local)
 
-### 1. Add foo.local to your hosts file
+### 1. Add mrifqyabdallah.local to your hosts file
 
 On Windows, open Notepad as Administrator and edit `C:\Windows\System32\drivers\etc\hosts`.  
 Add this line:
 
 ```
-127.0.0.1 foo.local
+127.0.0.1 mrifqyabdallah.local
 ```
 
 ### 2. Set up environment
@@ -46,10 +46,10 @@ docker compose exec app php artisan migrate
 
 | URL | What |
 |-----|------|
-| https://foo.local | Your Laravel app |
-| http://foo.local:5173 | Vite dev server (HMR) |
+| https://mrifqyabdallah.local | Your Laravel app |
+| http://mrifqyabdallah.local:5173 | Vite dev server (HMR) |
 
-Your browser will show a security warning for `foo.local` because the certificate is self-signed.  
+Your browser will show a security warning for `mrifqyabdallah.local` because the certificate is self-signed.  
 Click **Advanced → Proceed** (Chrome) or **Accept the Risk** (Firefox). You only need to do this once.
 
 ---

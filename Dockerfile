@@ -1,7 +1,7 @@
 # =============================================================================
 # Build stage: install composer & node dependencies, build frontend assets
 # =============================================================================
-FROM dunglas/frankenphp:latest-php8.5 AS builder
+FROM dunglas/frankenphp:1-php8.5 AS builder
 
 WORKDIR /app
 
@@ -51,7 +51,7 @@ RUN npm run build && rm -rf node_modules
 # =============================================================================
 # Production stage: lean runtime image
 # =============================================================================
-FROM dunglas/frankenphp:latest-php8.5
+FROM dunglas/frankenphp:1-php8.5
 
 WORKDIR /app
 
