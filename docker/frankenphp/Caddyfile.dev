@@ -1,7 +1,3 @@
-{
-    admin off
-}
-
 http://{$APP_HOST:mrifqyabdallah.local} {
     root * /app/public
     php_server
