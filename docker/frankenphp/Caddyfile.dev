@@ -1,4 +1,4 @@
-http://{$APP_HOST:mrifqyabdallah.local} {
+http://{$APP_HOST:mrifqyabdallah.test} {
     root * /app/public
     php_server
     file_server

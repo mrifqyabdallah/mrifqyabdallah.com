@@ -17,15 +17,15 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
-      APP_URL: https://${APP_HOST:-mrifqyabdallah.local}
+      APP_URL: https://${APP_HOST:-mrifqyabdallah.test}
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432
       DB_DATABASE: ${DB_DATABASE:-mrifqyabdallah}
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
-      VITE_DEV_SERVER_URL: http://${APP_HOST:-mrifqyabdallah.local}:5173
-      APP_HOST: ${APP_HOST:-mrifqyabdallah.local}
+      VITE_DEV_SERVER_URL: http://${APP_HOST:-mrifqyabdallah.test}:5173
+      APP_HOST: ${APP_HOST:-mrifqyabdallah.test}
     depends_on:
       postgres:
         condition: service_healthy

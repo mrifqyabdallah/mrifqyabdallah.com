@@ -28,7 +28,7 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: process.env.APP_HOST ?? 'mrifqyabdallah.local',
+            host: process.env.APP_HOST ?? 'mrifqyabdallah.test',
             port: 5173,
         },
     },
