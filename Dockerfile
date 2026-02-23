@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     curl \
     gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -24,6 +24,8 @@ RUN install-php-extensions \
     pcntl \
     bcmath
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 # =============================================================================
 # Build stage: install dependencies and compile assets for production
 # =============================================================================
@@ -34,9 +36,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Copy composer from official image
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Install PHP dependencies (no dev)
 COPY composer.json composer.lock ./
