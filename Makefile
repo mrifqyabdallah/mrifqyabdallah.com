@@ -39,13 +39,6 @@ dev.init:
 		sleep 2; \
 	done
 	@echo ""
-	@echo "Checking app key..."
-	@if [ -z "$$(grep '^APP_KEY=.\+' .env)" ]; then \
-		echo "Generating app key..."; \
-		docker compose exec app php artisan key:generate; \
-	else \
-		echo "APP_KEY already set, skipping."; \
-	fi
 	@echo "Running migrations..."
 	docker compose exec app php artisan migrate
 	@echo ""
