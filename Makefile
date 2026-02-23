@@ -82,7 +82,7 @@ d.fresh:
 	@read -p "WARNING: This will wipe your database. Are you sure? [y/N] " confirm; \
 	[ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ] || (echo "Aborted." && exit 1)
 	docker compose down --volumes --remove-orphans
-	docker compose up -d --build
+	$(MAKE) dev.init
 
 d.logs:
 	docker compose logs -f $(filter-out $@, $(MAKECMDGOALS))
