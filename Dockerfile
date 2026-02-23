@@ -1,23 +1,16 @@
 # =============================================================================
-# Build stage: install composer & node dependencies, build frontend assets
+# Runtime stage: lean image with extensions — used as base for both dev and prod
 # =============================================================================
-FROM dunglas/frankenphp:1-php8.5 AS builder
+FROM dunglas/frankenphp:1-php8.5 AS runtime
 
 WORKDIR /app
 
-# Install system dependencies needed for PHP extensions and Node.js
+# Install runtime PHP extensions only
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gnupg \
-    git \
-    unzip \
     libpq-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install required PHP extensions
 RUN install-php-extensions \
     pdo_pgsql \
     pgsql \
@@ -26,6 +19,22 @@ RUN install-php-extensions \
     zip \
     pcntl \
     bcmath
+
+# =============================================================================
+# Build stage: install composer & node dependencies, build frontend assets
+# =============================================================================
+FROM runtime AS builder
+
+# Install system dependencies needed for Node.js and Composer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gnupg \
+    git \
+    unzip \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -49,26 +58,9 @@ RUN composer dump-autoload --optimize && \
 RUN npm run build && rm -rf node_modules
 
 # =============================================================================
-# Production stage: lean runtime image
+# Production stage: copy built app into runtime image
 # =============================================================================
-FROM dunglas/frankenphp:1-php8.5
-
-WORKDIR /app
-
-# Install runtime PHP extensions only
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN install-php-extensions \
-    pdo_pgsql \
-    pgsql \
-    opcache \
-    intl \
-    zip \
-    pcntl \
-    bcmath
+FROM runtime AS production
 
 # Copy built application from builder stage
 COPY --from=builder /app /app
@@ -83,6 +75,6 @@ COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 # Use non-root user for security
 USER www-data
 
-EXPOSE 8080
+EXPOSE 80 443
 
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
