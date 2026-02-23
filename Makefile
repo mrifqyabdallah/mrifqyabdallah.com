@@ -50,7 +50,7 @@ dev.init:
 	docker compose exec app php artisan migrate
 	@echo ""
 	@echo "Waiting for Vite to be ready..."
-	@until docker compose exec app curl -sf http://localhost:5173 > /dev/null 2>&1; do \
+	@until docker compose exec app curl -s http://localhost:5173 > /dev/null 2>&1; do \
 		printf "."; \
 		sleep 2; \
 	done
