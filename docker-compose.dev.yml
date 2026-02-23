@@ -21,7 +21,7 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
-      APP_URL: https://${APP_HOST:-mrifqyabdallah.test}
+      APP_URL: http://${APP_HOST:-mrifqyabdallah.test}
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432

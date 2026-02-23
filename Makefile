@@ -38,6 +38,7 @@ dev.init:
 		printf "."; \
 		sleep 2; \
 	done
+	@echo ""
 	@echo "Checking app key..."
 	@if [ -z "$$(grep '^APP_KEY=.\+' .env)" ]; then \
 		echo "Generating app key..."; \
