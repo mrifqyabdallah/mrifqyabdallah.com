@@ -38,6 +38,11 @@ dev.init:
 		printf "."; \
 		sleep 2; \
 	done
+	@echo "Waiting for Vite to be ready..."
+	@until docker compose exec app curl -sf http://localhost:5173 > /dev/null 2>&1; do \
+		printf "."; \
+		sleep 2; \
+	done
 	@echo ""
 	@echo "Installing PHP dependencies..."
 	docker compose exec app composer install
@@ -86,15 +91,14 @@ d.logs:
 # App container
 # =============================================================================
 
-# Open interactive bash shell in app container
-# Usage: make app
-app:
-	docker compose exec app bash
-
-# Run any command in app container
+# Open interactive bash shell in app container, or run a command inside
 # Usage: make app bash, make app php -v
-app %:
-	docker compose exec app $(filter-out app, $(MAKECMDGOALS))
+app:
+	@if [ -z "$(filter-out $@, $(MAKECMDGOALS))" ]; then \
+		docker compose exec app bash; \
+	else \
+		docker compose exec app $(filter-out $@, $(MAKECMDGOALS)); \
+	fi
 
 # Run php artisan commands
 # Usage: make artisan migrate

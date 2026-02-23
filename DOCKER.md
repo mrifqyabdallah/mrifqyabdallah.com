@@ -20,6 +20,8 @@ Edit `C:\Windows\System32\drivers\etc\hosts` and add the dev domain (must use `.
 
 ### 2. Run setup
 
+For a fresh install, simply run:
+
 ```bash
 make dev.init
 ```
@@ -35,6 +37,11 @@ This will:
 - Run migrations
 - Print your app URL
 
+Otherwise, just run Vite:
+```bash
+make npm run dev
+```
+
 ### 4. Access the app
 
 | URL                               | What |
@@ -44,7 +51,9 @@ This will:
 
 ---
 
-## Daily usage
+## Makefile
+
+Docker compose:
 
 ```bash
 make d up          # start containers
@@ -54,24 +63,21 @@ make d.restart     # stop and start without rebuilding
 make d.logs        # tail all logs
 make d.logs app    # tail app container logs only
 ```
-
----
-
-## Common commands
+Common commands:
 
 ```bash
 # Artisan
 make artisan migrate
-make artisan "migrate:fresh --seed"
+make artisan "migrate:fresh --seed" # flags (--) must be quoted
 make artisan tinker
 
 # Composer
 make composer install
-make composer "require some/package"
+make composer require some/package
 
 # npm
 make npm install
-make npm "run build"
+make npm run dev
 
 # Shell access
 make app           # bash in app container
