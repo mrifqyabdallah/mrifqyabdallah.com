@@ -1,13 +1,17 @@
 # =============================================================================
-# Runtime stage: lean image with extensions — used as base for both dev and prod
+# Runtime stage: base image with PHP extensions + Node
+# Used directly in dev (via volume mount) and as base for prod build
 # =============================================================================
 FROM dunglas/frankenphp:1-php8.5 AS runtime
 
 WORKDIR /app
 
-# Install runtime PHP extensions only
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
+    curl \
+    gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -21,18 +25,13 @@ RUN install-php-extensions \
     bcmath
 
 # =============================================================================
-# Build stage: install composer & node dependencies, build frontend assets
+# Build stage: install dependencies and compile assets for production
 # =============================================================================
 FROM runtime AS builder
 
-# Install system dependencies needed for Node.js and Composer
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gnupg \
     git \
     unzip \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

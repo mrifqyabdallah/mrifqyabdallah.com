@@ -1,7 +1,8 @@
 services:
 
   # ---------------------------------------------------------------------------
-  # FrankenPHP — Laravel application server
+  # FrankenPHP — Laravel application server + Vite dev server
+  # Both run in the same container so wayfinder can access php
   # ---------------------------------------------------------------------------
   app:
     build:
@@ -12,9 +13,11 @@ services:
     volumes:
       - .:/app
       - ./docker/frankenphp/Caddyfile.dev:/etc/frankenphp/Caddyfile:ro
+      - ./docker/frankenphp/entrypoint.dev.sh:/entrypoint.dev.sh:ro
     ports:
       - "80:80"
       - "443:443"
+      - "5173:5173"
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
@@ -35,20 +38,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    networks:
-      - laravel
-
-  # ---------------------------------------------------------------------------
-  # Vite — frontend dev server with HMR
-  # ---------------------------------------------------------------------------
-  vite:
-    image: node:22-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
-    ports:
-      - "5173:5173"
-    command: sh -c "npm install && npm run dev"
+    entrypoint: ["sh", "/entrypoint.dev.sh"]
     networks:
       - laravel
 
