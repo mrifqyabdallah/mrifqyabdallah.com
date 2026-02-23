@@ -1,7 +1,11 @@
 #!/bin/sh
 set -e
 
-# Install node dependencies if node_modules is missing
+if [ ! -d "vendor" ]; then
+    echo "Installing PHP dependencies..."
+    composer install
+fi
+
 if [ ! -d "node_modules" ]; then
     echo "Installing node dependencies..."
     npm install

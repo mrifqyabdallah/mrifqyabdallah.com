@@ -38,14 +38,6 @@ dev.init:
 		printf "."; \
 		sleep 2; \
 	done
-	@echo "Waiting for Vite to be ready..."
-	@until docker compose exec app curl -sf http://localhost:5173 > /dev/null 2>&1; do \
-		printf "."; \
-		sleep 2; \
-	done
-	@echo ""
-	@echo "Installing PHP dependencies..."
-	docker compose exec app composer install
 	@echo "Checking app key..."
 	@if [ -z "$$(grep '^APP_KEY=.\+' .env)" ]; then \
 		echo "Generating app key..."; \
@@ -55,6 +47,12 @@ dev.init:
 	fi
 	@echo "Running migrations..."
 	docker compose exec app php artisan migrate
+	@echo ""
+	@echo "Waiting for Vite to be ready..."
+	@until docker compose exec app curl -sf http://localhost:5173 > /dev/null 2>&1; do \
+		printf "."; \
+		sleep 2; \
+	done
 	@echo ""
 	@echo "✓ Done! Your app is running at $$(grep '^APP_URL=' .env | cut -d '=' -f2)"
 
