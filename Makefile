@@ -122,7 +122,7 @@ postgres:
 
 # Open psql CLI directly
 pg:
-	docker compose exec postgres psql -U $${DB_USERNAME:-laravel} -d $${DB_DATABASE:-laravel}
+	docker compose exec postgres psql -U $${DB_USERNAME:-laravel} -d $${DB_DATABASE:-mrifqyabdallah}
 
 # =============================================================================
 # Prevent make from treating arguments as targets
