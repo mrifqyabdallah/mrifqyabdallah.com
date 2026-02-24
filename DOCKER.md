@@ -34,10 +34,16 @@ This will:
 - Wait for the app to be healthy
 - Run `composer install`
 - Generate `APP_KEY` (if not set)
+- Create storage link (if not set)
 - Run migrations
 - Print your app URL
 
-Otherwise, just run Vite:
+To stop the container, run:
+```bash
+make d down
+```
+
+Next time you open the project, spin up the container using:
 ```bash
 make d up
 ```
@@ -186,6 +192,8 @@ docker compose exec app php artisan migrate --force
 ### Subsequent deploys
 
 Everything is automated — just push to `main`. GitHub Actions will run static analysis and tests, build and push the image to GHCR, then deploy to your VPS automatically.
+
+The action will also automatically run `artisan migrate`, as defined in [deploy.yml](.github/workflows/deploy.yml).
 
 ### Manual deploy (if needed)
 

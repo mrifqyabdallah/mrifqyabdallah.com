@@ -1,7 +1,11 @@
 #!/bin/sh
 set -e
 
-# Run Laravel optimization on every startup
+if [ ! -d "public/storage" ]; then
+    php artisan storage:link
+fi
+
+php artisan optimize:clear
 php artisan optimize
 
 # Start FrankenPHP in foreground

@@ -11,6 +11,11 @@ if [ -f ".env" ] && [ -z "$(grep '^APP_KEY=.\+' .env)" ]; then
     php artisan key:generate
 fi
 
+if [ ! -d "public/storage" ]; then
+    echo "Creating storage link..."
+    php artisan storage:link
+fi
+
 if [ ! -d "node_modules" ]; then
     echo "Installing node dependencies..."
     npm install

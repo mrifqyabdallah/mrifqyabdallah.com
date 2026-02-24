@@ -16,7 +16,7 @@ services:
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_DATABASE: ${DB_DATABASE:-laravel}
+      DB_DATABASE: ${DB_DATABASE:-mrifqyabdallah}
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD}
       APP_HOST: ${APP_HOST:-mrifqyabdallah.com}
