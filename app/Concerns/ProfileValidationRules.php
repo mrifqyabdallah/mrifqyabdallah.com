@@ -3,6 +3,7 @@
 namespace App\Concerns;
 
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rule;
 
 trait ProfileValidationRules
@@ -32,6 +33,8 @@ trait ProfileValidationRules
 
     /**
      * Get the validation rules used to validate user emails.
+     * Newly registered user must use whitelisted email in `user_registrations` table,
+     * while user updating their email must be unique to the `users` table.
      *
      * @return array<int, \Illuminate\Contracts\Validation\Rule|array<mixed>|string>
      */
@@ -43,7 +46,9 @@ trait ProfileValidationRules
             'email',
             'max:255',
             $userId === null
-                ? Rule::unique(User::class)
+                ? Rule::exists('user_registrations', 'email')->where(function (Builder $query) {
+                    $query->whereNull('user_id');
+                })
                 : Rule::unique(User::class)->ignore($userId),
         ];
     }
