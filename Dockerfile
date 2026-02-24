@@ -70,9 +70,16 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache && \
 # Copy FrankenPHP/Caddy server config
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
+# Copy prod entrypoint
+COPY docker/frankenphp/entrypoint.prod.sh /entrypoint.sh
+RUN chmod +x /entrypoint.prod.sh
+
+# Copy OPcache configuration
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
 # Use non-root user for security
 USER www-data
 
 EXPOSE 80 443
 
-CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+ENTRYPOINT ["/entrypoint.sh"]

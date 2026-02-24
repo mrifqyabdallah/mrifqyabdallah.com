@@ -5,13 +5,14 @@ on:
     branches: [ "*" ]
   pull_request:
     branches: [ "*" ]
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
   phpstan-inspections:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code

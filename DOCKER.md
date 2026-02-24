@@ -111,6 +111,7 @@ Prompts for confirmation, then removes all containers and volumes (including the
 2. Add your domain and set the DNS A record to your VPS IP
 3. Enable the proxy (orange cloud ☁️)
 4. Set SSL/TLS mode to **Full (strict)** under SSL/TLS → Overview
+5. Add a wildcard CNAME — name `*`, target `@` (proxied) — for subdomains
 
 ### Create a Cloudflare API token
 
@@ -120,74 +121,82 @@ Prompts for confirmation, then removes all containers and volumes (including the
 4. Under Zone Resources, select your domain
 5. Copy the token
 
-### Set up environment on the VPS
+### Add GitHub Actions secrets
+
+In your GitHub repo, go to Settings → Secrets and variables → Actions, and add:
+
+| Secret | Value |
+|--------|-------|
+| `VPS_HOST` | Your VPS IP address |
+| `VPS_USER` | SSH username (e.g. `root`) |
+| `VPS_SSH_KEY` | Your private SSH key |
+
+### Bootstrap the VPS (first time only)
+
+SSH into your VPS and run:
 
 ```bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Login to GHCR, then enter your GitHub Personal Access Token
+docker login ghcr.io -u your-github-username
+
+# Clone the repo to get docker-compose.prod.yml
+git clone https://github.com/yourusername/yourapp.git /app
+cd /app
+
+# Setup compose and env
 cp docker-compose.prod.yml docker-compose.yml
 cp .env.example .env
+
+nano .env  # fill in all prod values (see below)
 ```
 
-Edit `.env` and set:
+Required `.env` values for prod:
 
 ```
+GITHUB_REPOSITORY="mrifqyabdallah/mrifqyabdallah.com"
+APP_URL=https://mrifqyabdallah.com
+APP_HOST=mrifqyabdallah.com
 APP_ENV=production
 APP_DEBUG=false
-APP_HOST=foo.com
-APP_URL=https://foo.com
-APP_KEY=           # see below
-DB_PASSWORD=       # use a strong password
-CF_DNS_API_TOKEN=  # your Cloudflare API token
-ACME_EMAIL=        # your email for Let's Encrypt
+
+APP_KEY=             # generate locally then copy-paste
+DB_PASSWORD=         # use a strong password
+CF_DNS_API_TOKEN=    # your Cloudflare API token
+ACME_EMAIL=          # your email for Let's Encrypt
 ```
 
-### Generate an app key
+Optionally, whitelist Cloudflare connection
 
 ```bash
-docker run --rm dunglas/frankenphp:1-php8.5 php artisan key:generate --show
+chmod +x /app/scripts/update-cloudflare-ips.sh
+/app/scripts/update-cloudflare-ips.sh
+
+# Add weekly cron job
+(crontab -l 2>/dev/null; echo "0 3 * * 1 /app/scripts/update-cloudflare-ips.sh >> /var/log/update-cloudflare-ips.log 2>&1") | crontab -
 ```
 
-Paste the output as `APP_KEY` in your `.env`.
-
-### Deploy
+Then pull and start:
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 docker compose exec app php artisan migrate --force
 ```
 
-The first deploy will build the image (installs dependencies, compiles frontend assets) and obtain a Let's Encrypt certificate via Cloudflare DNS — this takes about 30 seconds.
+### Subsequent deploys
 
-### Deploying updates
+Everything is automated — just push to `main`. GitHub Actions will run static analysis and tests, build and push the image to GHCR, then deploy to your VPS automatically.
+
+### Manual deploy (if needed)
+
+From your VPS:
 
 ```bash
-git pull
-docker compose up -d --build
+cd /app
+docker compose pull
+docker compose up -d
 docker compose exec app php artisan migrate --force
-```
-
-### Adding subdomains (e.g. bar.foo.com)
-
-Add a DNS CNAME record in Cloudflare pointing `bar` to `foo.com` (proxied).  
-No Docker or Caddy config changes needed — the wildcard cert (`*.foo.com`) already covers it.  
-Handle subdomain routing inside Laravel using route groups.
-
----
-
-## File structure
-
-```
-your-project/
-├── Dockerfile                      # Multi-stage: runtime → builder → production
-├── .dockerignore
-├── Makefile                        # Shortcuts for common commands
-├── docker-compose.dev.yml          # Copy to docker-compose.yml for dev
-├── docker-compose.prod.yml         # Copy to docker-compose.yml for prod
-├── vite.config.js                  # Modified for Docker HMR support
-├── .env.example                    # Template — copy to .env and fill in values
-├── DOCKER.md                       # This file
-└── docker/
-    └── frankenphp/
-        ├── Caddyfile.dev           # Caddy config for dev (HTTP only)
-        ├── Caddyfile.prod          # Caddy config for prod (Let's Encrypt + Cloudflare)
-        └── entrypoint.dev.sh       # Dev entrypoint: starts FrankenPHP + Vite together
 ```
