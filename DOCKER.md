@@ -39,16 +39,13 @@ This will:
 
 Otherwise, just run Vite:
 ```bash
-make npm run dev
+make d up
 ```
 
 ### 4. Access the app
-
-| URL                               | What |
-|-----------------------------------|------|
-| `http://mrifqyabdallah.test`      | Your Laravel app |
-| `http://mrifqyabdallah.test:5173` | Vite dev server (HMR) |
-
+- The app : `http://mrifqyabdallah.test`
+- Vite dev server (HMR) : `http://mrifqyabdallah.test:5173`
+- PostgreSQL at port 5432, using your env username/password
 ---
 
 ## Makefile
