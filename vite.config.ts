@@ -24,4 +24,12 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: process.env.APP_HOST ?? 'mrifqyabdallah.test',
+            port: 5173,
+        },
+    },
 });
