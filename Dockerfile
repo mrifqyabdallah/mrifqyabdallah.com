@@ -53,7 +53,8 @@ RUN composer dump-autoload --optimize && \
     composer run-script post-autoload-dump || true
 
 # Build frontend assets
-RUN cp .env.example .env && \
+RUN chmod -R 775 bootstrap/cache storage && \
+    cp .env.example .env && \
     php artisan key:generate && \
     npm run build && \
     rm -rf node_modules .env
