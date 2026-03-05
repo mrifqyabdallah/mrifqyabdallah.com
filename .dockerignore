@@ -22,11 +22,11 @@ vendor/
 node_modules/
 
 # Laravel generated / runtime files (generated at runtime or by build step)
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-bootstrap/cache/
+bootstrap/cache/*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
 
 # Built frontend assets (rebuilt during Docker build)
 public/build/
