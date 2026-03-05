@@ -43,7 +43,7 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="Welcome">
+            <Head title="My hands craft with care">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
@@ -106,8 +106,10 @@ export default function Welcome({
                                         <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
                                             I'm Rifqy Abdallah, a fullstack web
                                             developer focused on PHP/Laravel,
-                                            with a passion for exploring other
-                                            technologies.
+                                            currently learning CI/CD with
+                                            Docker Compose + GitHub actions +
+                                            VPS + CloudFlare, using this site
+                                            as my playground.
                                         </p>
                                         <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
                                             If you'd like to offer me some
@@ -183,10 +185,10 @@ export default function Welcome({
                             <AppearanceToggleTab />
 
                             <Button variant="ghost" asChild>
-                                <Link href="https://github.com/mrifqyabdallah/mrifqyabdallah.com">
+                                <a href="https://github.com/mrifqyabdallah/mrifqyabdallah.com" target="_blank">
                                     <GithubIcon />
                                     View source code
-                                </Link>
+                                </a>
                             </Button>
                         </div>
                         <div className="hidden h-14.5 lg:block"></div>
