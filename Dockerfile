@@ -53,7 +53,10 @@ RUN composer dump-autoload --optimize && \
     composer run-script post-autoload-dump || true
 
 # Build frontend assets
-RUN npm run build && rm -rf node_modules
+RUN cp .env.example .env && \
+    php artisan key:generate && \
+    npm run build && \
+    rm -rf node_modules .env
 
 # =============================================================================
 # Production stage: copy built app into runtime image
