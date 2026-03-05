@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a5558ae87628a3747db4205294f2ca69",
+    "content-hash": "b8a339f1a414a95f5e68f2f8a50032b1",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1511,6 +1511,61 @@
                 "source": "https://github.com/laravel/framework"
             },
             "time": "2026-02-24T14:35:15+00:00"
+        },
+        {
+            "name": "laravel/laravel",
+            "version": "v12.11.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/laravel.git",
+                "reference": "51cd69753265aee56bf69fd30ddec1191db06aed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/laravel/zipball/51cd69753265aee56bf69fd30ddec1191db06aed",
+                "reference": "51cd69753265aee56bf69fd30ddec1191db06aed",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^12.0",
+                "laravel/tinker": "^2.10.1",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^1.23",
+                "laravel/pail": "^1.2.2",
+                "laravel/pint": "^1.24",
+                "laravel/sail": "^1.41",
+                "mockery/mockery": "^1.6",
+                "nunomaduro/collision": "^8.6",
+                "phpunit/phpunit": "^11.5.3"
+            },
+            "type": "project",
+            "extra": {
+                "laravel": {
+                    "dont-discover": []
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "App\\": "app/",
+                    "Database\\Seeders\\": "database/seeders/",
+                    "Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The skeleton application for the Laravel framework.",
+            "keywords": [
+                "framework",
+                "laravel"
+            ],
+            "support": {
+                "source": "https://github.com/laravel/laravel/tree/v12.11.2"
+            },
+            "time": "2026-01-19T17:57:25+00:00"
         },
         {
             "name": "laravel/prompts",
