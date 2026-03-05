@@ -29,7 +29,7 @@ services:
     volumes:
       - caddy_data:/data
       - ./docker/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
-    entrypoint: ["/app/docker/frankenphp/entrypoint.prod.sh"]
+    entrypoint: ["/entrypoint.sh"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/up || exit 1"]
       interval: 10s
