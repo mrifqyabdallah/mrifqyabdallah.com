@@ -76,7 +76,7 @@ COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
 # Copy prod entrypoint
 COPY docker/frankenphp/entrypoint.prod.sh /entrypoint.sh
-RUN chmod +x /entrypoint.prod.sh
+RUN chmod +x /entrypoint.sh
 
 # Copy OPcache configuration
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
