@@ -68,7 +68,7 @@ FROM runtime AS production
 COPY --from=builder /app /app
 
 # Set correct permissions for Laravel writable directories
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/public && \
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/public /data && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
 # Copy FrankenPHP/Caddy server config
