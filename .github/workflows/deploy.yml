@@ -9,11 +9,11 @@ permissions:
   packages: write
 
 jobs:
-  static-analysis:
-    uses: ./.github/workflows/static-analysis.yml
+  phpstan:
+    uses: ./.github/workflows/phpstan.yml
 
-  tests:
-    uses: ./.github/workflows/tests.yml
+  pest:
+    uses: ./.github/workflows/pest.yml
 
   build:
     needs: [static-analysis, tests]
