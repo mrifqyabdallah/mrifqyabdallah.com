@@ -11,6 +11,10 @@ set -e
 
 echo "[$(date)] Updating Cloudflare IP ranges..."
 
+# Block direct access to ports 80 and 443 from everyone else
+ufw deny 80
+ufw deny 443
+
 # Remove existing Cloudflare UFW rules
 echo "Removing old Cloudflare rules..."
 ufw status numbered | grep 'Cloudflare' | awk -F'[][]' '{print $2}' | sort -rn | while read num; do
@@ -28,10 +32,6 @@ echo "Adding IPv6 ranges..."
 for ip in $(curl -s https://www.cloudflare.com/ips-v6); do
     ufw allow from "$ip" to any port 80,443 proto tcp comment 'Cloudflare'
 done
-
-# Block direct access to ports 80 and 443 from everyone else
-ufw deny 80
-ufw deny 443
 
 # Reload UFW to apply changes
 ufw reload
