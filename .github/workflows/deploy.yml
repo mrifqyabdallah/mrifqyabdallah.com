@@ -53,6 +53,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Clean up old images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: mrifqyabdallah.com
+          package-type: container
+          min-versions-to-keep: 9
+
   deploy:
     needs: [build]
     runs-on: ubuntu-24.04
