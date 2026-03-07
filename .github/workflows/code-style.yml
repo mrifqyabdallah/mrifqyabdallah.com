@@ -1,4 +1,4 @@
-name: Linter (Pint)
+name: Code style
 
 on:
   push:
@@ -6,9 +6,13 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   quality:
+    # Skip if this push was triggered by the Actions bot merging a lint PR,
+    # preventing an infinite loop of lint → PR → merge → lint → ...
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -33,7 +37,16 @@ jobs:
         run: npm run lint
 
       - name: Commit Changes
+        id: auto_commit
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: fix code style
           commit_options: '--no-verify'
+          branch: fix/code-style-${{ github.run_id }}
+          create_branch: true
+
+      - name: Open Pull Request
+        if: steps.auto_commit.outputs.changes_detected == 'true'
+        run: gh pr create --base main --head fix/code-style-${{ github.run_id }} --title "fix code style" --body "Automated code style fixes"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
