@@ -106,10 +106,10 @@ export default function Welcome({
                                         <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
                                             I'm Rifqy Abdallah, a fullstack web
                                             developer focused on PHP/Laravel,
-                                            currently learning CI/CD with
-                                            Docker Compose + GitHub actions +
-                                            VPS + CloudFlare, using this site
-                                            as my playground.
+                                            currently learning CI/CD with Docker
+                                            Compose + GitHub actions + VPS +
+                                            CloudFlare, using this site as my
+                                            playground.
                                         </p>
                                         <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
                                             If you'd like to offer me some
@@ -185,7 +185,10 @@ export default function Welcome({
                             <AppearanceToggleTab />
 
                             <Button variant="ghost" asChild>
-                                <a href="https://github.com/mrifqyabdallah/mrifqyabdallah.com" target="_blank">
+                                <a
+                                    href="https://github.com/mrifqyabdallah/mrifqyabdallah.com"
+                                    target="_blank"
+                                >
                                     <GithubIcon />
                                     View source code
                                 </a>
