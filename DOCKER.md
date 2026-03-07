@@ -71,7 +71,7 @@ Common commands:
 ```bash
 # Artisan
 make artisan migrate
-make artisan "migrate:fresh --seed" # flags (--) must be quoted
+make artisan "migrate:fresh --seed" # flags must be quoted
 make artisan tinker
 
 # Composer
@@ -105,34 +105,29 @@ Prompts for confirmation, then removes all containers and volumes (including the
 ### Prerequisites on your VPS
 
 - Docker and Docker Compose installed
-- Ports 80 and 443 open in your firewall
-- Your domain pointed at your VPS IP in Cloudflare
+- Access to your VPS command line or SSH
 
 ### Cloudflare setup
 
 1. Log in to [Cloudflare](https://dash.cloudflare.com)
 2. Add your domain and set the DNS A record to your VPS IP
 3. Enable the proxy (orange cloud ☁️)
-4. Set SSL/TLS mode to **Full (strict)** under SSL/TLS → Overview
-5. Add a wildcard CNAME — name `*`, target `@` (proxied) — for subdomains
-
-### Create a Cloudflare API token
-
-1. Go to https://dash.cloudflare.com/profile/api-tokens
-2. Click **Create Token**
-3. Use the **Edit zone DNS** template
-4. Under Zone Resources, select your domain
-5. Copy the token
+4. Add a CNAME targeting the root (`@`) of your domain
+5. Try to open your domain now. It should shows the Cloudflare error page with the server indicated as down.
 
 ### Add GitHub Actions secrets
 
+> This is required for automatic deployment through GitHub Actions, as defined in [deploy.yml](./.github/workflows/deploy.yml)
+
 In your GitHub repo, go to Settings → Secrets and variables → Actions, and add:
+
 
 | Secret | Value |
 |--------|-------|
 | `VPS_HOST` | Your VPS IP address |
 | `VPS_USER` | SSH username (e.g. `root`) |
 | `VPS_SSH_KEY` | Your private SSH key |
+
 
 ### Bootstrap the VPS (first time only)
 
@@ -142,11 +137,8 @@ SSH into your VPS and run:
 # Install Docker
 curl -fsSL https://get.docker.com | sh
 
-# Login to GHCR, then enter your GitHub Personal Access Token
-docker login ghcr.io -u your-github-username
-
-# Clone the repo to get docker-compose.prod.yml
-git clone https://github.com/yourusername/yourapp.git /app
+# Clone this repo to get docker-compose.prod.yml
+git clone https://github.com/mrifqyabdallah/mrifqyabdallah.com.git /app
 cd /app
 
 # Setup compose and env
@@ -167,14 +159,15 @@ APP_DEBUG=false
 
 APP_KEY=             # generate locally then copy-paste
 DB_PASSWORD=         # use a strong password
-CF_DNS_API_TOKEN=    # your Cloudflare API token
 ACME_EMAIL=          # your email for Let's Encrypt
 ```
 
 Optionally, whitelist Cloudflare connection
 
 ```bash
+# chmod if necessary
 chmod +x /app/scripts/update-cloudflare-ips.sh
+
 /app/scripts/update-cloudflare-ips.sh
 
 # Add weekly cron job
@@ -205,3 +198,4 @@ docker compose pull
 docker compose up -d
 docker compose exec app php artisan migrate --force
 ```
+
