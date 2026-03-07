@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/pest.yml
 
   build:
-    needs: [static-analysis, tests]
+    needs: [phpstan, pest]
     runs-on: ubuntu-24.04
     outputs:
       image: ${{ steps.meta.outputs.tags }}
