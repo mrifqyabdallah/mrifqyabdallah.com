@@ -1,4 +1,4 @@
-name: Static analysis (Larastan/PHPStan)
+name: PHPStan
 
 on:
   push:
