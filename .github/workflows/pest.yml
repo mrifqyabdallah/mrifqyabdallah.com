@@ -1,4 +1,4 @@
-name: Tests (Pest)
+name: Pest
 
 on:
   push:
