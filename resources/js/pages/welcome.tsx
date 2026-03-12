@@ -5,6 +5,7 @@ import AppearanceToggleTab from '@/components/appearance-tabs';
 import { Button } from '@/components/ui/button';
 import type { SharedData } from '@/types';
 import { dashboard, login, register } from '@/routes';
+import { index as blog } from '@/routes/blog';
 
 type Website = {
     title: string;
@@ -139,11 +140,31 @@ export default function Welcome({
                                                     </Link>
                                                 </Button>
                                             </li>
+                                            <li>
+                                                <Button size="lg">
+                                                    <Link
+                                                        href={blog()}
+                                                    >
+                                                        My Community Blog
+                                                    </Link>
+                                                </Button>
+                                            </li>
                                         </ul>
                                     </div>
                                     <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
                                         <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                            Some hand-made of mine:
+                                            I tried to create a simple blog platform
+                                            for the community.
+                                            {" "}
+                                            <Link
+                                                className="underline underline-offset-4"
+                                                href={blog()}
+                                            >
+                                                Read here, or you can create your own post too!
+                                            </Link>
+                                        </p>
+                                        <p className="mt-4 mb-2 text-[#706f6c] dark:text-[#A1A09A]">
+                                            Another hand-made of mine:
                                         </p>
                                         <ul>
                                             {websites.map(

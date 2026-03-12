@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 @import 'tw-animate-css';
 
@@ -7,6 +8,7 @@
 @import 'shadcn/tailwind.css';
 
 @import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/cascadia-code';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -208,4 +210,35 @@
     --radius-2xl: calc(var(--radius) + 8px);
     --radius-3xl: calc(var(--radius) + 12px);
     --radius-4xl: calc(var(--radius) + 16px);
+}
+
+@layer base {
+    .prose :where(code):not(:where([class~='not-prose'] *)) {
+        color: var(--foreground) !important;
+        background-color: var(--muted) !important;
+        font-size: 0.9em !important;
+    }
+
+    .prose :where(pre):not(:where([class~='not-prose'] *)) {
+        color: var(--foreground) !important;
+        background-color: var(--muted) !important;
+        border: 1px solid var(--border);
+    }
+
+    .prose :where(pre code):not(:where([class~='not-prose'] *)) {
+        color: inherit !important;
+        background-color: transparent !important;
+    }
+    
+    .prose :where(code, pre):not(:where([class~='not-prose'] *)) {
+        font-family: 'Cascadia Code Variable', monospace;
+    }
+
+    .prose :where(h1, h2, h3, h4, h5, h6) a {
+        text-decoration: none !important;
+    }
+
+    .prose :where(h1, h2, h3, h4, h5, h6) a:hover {
+        text-decoration: underline !important;
+    }
 }
