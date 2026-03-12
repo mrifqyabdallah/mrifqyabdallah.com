@@ -16,7 +16,8 @@
         "laravel/laravel": "^12.11",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
-        "nexxai/laravel-cfcache": "^1.0"
+        "nexxai/laravel-cfcache": "^1.0",
+        "spatie/yaml-front-matter": "^2.1"
     },
     "require-dev": {
         "ekino/phpstan-banned-code": "^3.0",

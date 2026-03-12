@@ -1,0 +1,45 @@
+name: Validate Blog Frontmatter
+
+on:
+  pull_request:
+    paths:
+      - 'resources/blogs/**.md'
+
+jobs:
+  validate:
+    name: Validate blog markdown files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Get changed blog files
+        id: changed-files
+        run: |
+          # Get only added/modified .md files in resources/blogs/
+          FILES=$(git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD \
+            | grep '^resources/blogs/.*\.md$' \
+            | tr '\n' ',' \
+            | sed 's/,$//')
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+
+      - name: Run frontmatter validation
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          php artisan blogs:validate --files="${{ steps.changed-files.outputs.files }}"
+
+      - name: No blog files changed
+        if: steps.changed-files.outputs.files == ''
+        run: echo "No blog markdown files changed in this PR (this action should not run)"
