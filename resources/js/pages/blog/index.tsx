@@ -144,7 +144,7 @@ export default function BlogIndex({ blogs: initialBlogs, search: initialSearch, 
                             Thoughts, guides, and contributions from the community.
                         </p>
                         <Link className="text-muted-foreground text-xs italic"
-                            target="/blog/welcome-and-how-to-contribute"
+                            href="/blog/welcome-and-how-to-contribute"
                         >
                             Want to contribute? read here
                         </Link>
