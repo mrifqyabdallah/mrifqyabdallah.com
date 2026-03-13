@@ -74,7 +74,7 @@ class BlogSync extends Command
                     $blogData
                 );
 
-                $this->line(sprintf("  ✓ %s: %s", 
+                $this->line(sprintf('  ✓ %s: %s',
                     $existing ? 'Updated' : 'Created',
                     $data['source_file'],
                 ));

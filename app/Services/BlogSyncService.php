@@ -12,7 +12,7 @@ class BlogSyncService
     /**
      * Parse a markdown file into structured data ready for DB upsert.
      * Returns null if the file is invalid.
-     * 
+     *
      * @return null|array{
      *     slug: string,
      *     source_file: string,
@@ -41,9 +41,9 @@ class BlogSyncService
         $body = trim($document->body());
 
         if (
-            ! is_string($title) || empty($title) || 
-            ! is_string($creator) || empty($creator) || 
-            ! is_string($excerpt) || empty($excerpt) || 
+            ! is_string($title) || empty($title) ||
+            ! is_string($creator) || empty($creator) ||
+            ! is_string($excerpt) || empty($excerpt) ||
             empty($body) ||
             ! is_array($tags) || ! array_is_list($tags) || (array_filter($tags, 'is_string') !== $tags)
         ) {
@@ -65,12 +65,13 @@ class BlogSyncService
     /**
      * Extract slug and date from filename.
      * Expected format: yyyy-mm-dd-title-slug.md
-     * 
-     * @throws InvalidFormatException
+     *
      * @return null|array{
      *      date: string,
      *      slug: string,
      * }
+     *
+     * @throws InvalidFormatException
      */
     public function parseFilename(string $filename): ?array
     {
@@ -116,7 +117,7 @@ class BlogSyncService
     /**
      * Validate all required frontmatter fields are present and well-formed.
      * Returns array of error messages, empty array if valid.
-     * 
+     *
      * @return array<int, string>
      */
     public function validateFrontmatter(string $filename, string $contents): array

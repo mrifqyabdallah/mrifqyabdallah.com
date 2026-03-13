@@ -33,7 +33,7 @@ class BlogController extends Controller
     {
         $blog = Blog::where('slug', $slug)->first();
 
-        if (!$blog) {
+        if (! $blog) {
             session()->flash('not_found', 'This blog post wasn\'t found. Here are some you might like.');
 
             return $this->index($request)->toResponse($request)->setStatusCode(404);

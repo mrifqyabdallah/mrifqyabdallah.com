@@ -18,7 +18,7 @@ class BlogFeedController extends Controller
         $items = $blogs->map(function (Blog $blog) {
             $url = route('blog.show', ['slug' => $blog->slug]);
             $pubDate = $blog->published_at->toRfc2822String();
-            
+
             /** @var array<int, string> $blogTags */
             $blogTags = $blog->tags ?? [];
             $tags = collect($blogTags)
