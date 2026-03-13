@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     curl \
     gnupg \
+    supervisor \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
@@ -71,8 +72,9 @@ COPY --from=builder /app /app
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/public /data && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
-# Copy FrankenPHP/Caddy server config
+# Copy FrankenPHP/Caddy and supervisord config
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
+COPY docker/supervisor/supervisord.prod.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy prod entrypoint
 COPY docker/frankenphp/entrypoint.prod.sh /entrypoint.sh

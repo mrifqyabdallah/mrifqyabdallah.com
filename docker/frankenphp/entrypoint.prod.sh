@@ -10,6 +10,7 @@ php artisan route:clear
 php artisan view:clear
 
 php artisan optimize
+php artisan queue:restart
 
-# Start FrankenPHP in foreground
-exec frankenphp run --config /etc/frankenphp/Caddyfile
+# Start supervisord (manages FrankenPHP + queue worker)
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
