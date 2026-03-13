@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BlogStatus;
+use App\Exceptions\BlogNotFoundException;
 use App\Jobs\RecordBlogView;
 use App\Models\Blog;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +23,7 @@ class BlogController extends Controller
             ->published()
             ->when($search, fn (Builder $q): Builder => $q->search($search))
             ->when($tag, fn (Builder $q): Builder => $q->whereTagged($tag))
-            ->orderBy('published_at', 'desc')
+            ->latest('published_at')
             ->cursorPaginate(10)
             ->withQueryString();
 
@@ -31,13 +32,9 @@ class BlogController extends Controller
 
     public function show(Request $request, string $slug): mixed
     {
-        $blog = Blog::where('slug', $slug)->first();
-
-        if (! $blog) {
-            session()->flash('not_found', 'This blog post wasn\'t found. Here are some you might like.');
-
-            return $this->index($request)->toResponse($request)->setStatusCode(404);
-        }
+        $blog = Blog::where('slug', $slug)->firstOr(function () {
+            throw new BlogNotFoundException;
+        });
 
         RecordBlogView::dispatch(
             blogId: $blog->id,
