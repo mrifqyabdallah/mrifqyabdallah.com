@@ -53,6 +53,14 @@ class BlogValidate extends Command
 
             $filename = basename($filePath);
             $contents = file_get_contents($filePath);
+
+            
+            if (! $contents) {
+                $this->warn("  ⚠ Failed to get content: {$filePath}");
+
+                continue;
+            }
+
             $errors = $this->syncService->validateFrontmatter($filename, $contents);
 
             if (empty($errors)) {

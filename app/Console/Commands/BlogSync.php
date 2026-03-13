@@ -76,7 +76,7 @@ class BlogSync extends Command
 
                 $this->line(sprintf("  ✓ %s: %s", 
                     $existing ? 'Updated' : 'Created',
-                    is_string($data['source_file']) ? $data['source_file'] : 'Unknown source file',
+                    $data['source_file'],
                 ));
 
                 if ($existing) {

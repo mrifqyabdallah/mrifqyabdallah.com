@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
@@ -11,6 +12,17 @@ class BlogSyncService
     /**
      * Parse a markdown file into structured data ready for DB upsert.
      * Returns null if the file is invalid.
+     * 
+     * @return null|array{
+     *     slug: string,
+     *     source_file: string,
+     *     title: string,
+     *     creator: string,
+     *     excerpt: string,
+     *     content: string,
+     *     tags: array<int, string>,
+     *     published_at: string
+     * }
      */
     public function parseFile(string $filename, string $contents): ?array
     {
@@ -22,13 +34,19 @@ class BlogSyncService
 
         $document = YamlFrontMatter::parse($contents);
 
-        $title = $document->title;
-        $creator = $document->creator;
-        $excerpt = $document->excerpt;
-        $tags = $document->tags ?? [];
+        $title = $document->matter('title');
+        $creator = $document->matter('creator');
+        $excerpt = $document->matter('excerpt');
+        $tags = $document->matter('tags');
         $body = trim($document->body());
 
-        if (! $title || ! $creator || ! $excerpt || empty($body)) {
+        if (
+            ! is_string($title) || empty($title) || 
+            ! is_string($creator) || empty($creator) || 
+            ! is_string($excerpt) || empty($excerpt) || 
+            empty($body) ||
+            ! is_array($tags) || ! array_is_list($tags) || (array_filter($tags, 'is_string') !== $tags)
+        ) {
             return null;
         }
 
@@ -47,6 +65,12 @@ class BlogSyncService
     /**
      * Extract slug and date from filename.
      * Expected format: yyyy-mm-dd-title-slug.md
+     * 
+     * @throws InvalidFormatException
+     * @return null|array{
+     *      date: string,
+     *      slug: string,
+     * }
      */
     public function parseFilename(string $filename): ?array
     {
@@ -63,13 +87,13 @@ class BlogSyncService
 
         // Validate it's a real date
         try {
-            $date = Carbon::createFromFormat('Y-m-d', $dateString)->startOfDay();
+            $date = Carbon::createFromFormat('Y-m-d', $dateString)?->startOfDay();
         } catch (\Exception) {
             return null;
         }
 
         // Ensure slug is valid kebab-case
-        if (! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart)) {
+        if (is_null($date) || ! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart)) {
             return null;
         }
 
@@ -92,6 +116,8 @@ class BlogSyncService
     /**
      * Validate all required frontmatter fields are present and well-formed.
      * Returns array of error messages, empty array if valid.
+     * 
+     * @return array<int, string>
      */
     public function validateFrontmatter(string $filename, string $contents): array
     {

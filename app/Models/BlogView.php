@@ -15,11 +15,17 @@ class BlogView extends Model
         'date' => 'date',
     ];
 
+    /**
+     * @return BelongsTo<Blog, $this>
+     */
     public function blog(): BelongsTo
     {
         return $this->belongsTo(Blog::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
