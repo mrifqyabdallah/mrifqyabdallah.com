@@ -4,6 +4,7 @@ use App\Jobs\RecordBlogView;
 use App\Models\Blog;
 use App\Models\BlogView;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 // ---------------------------------------------------------------------------
 // Guest view deduplication
@@ -124,5 +125,29 @@ describe('RecordBlogView — cross-blog', function () {
         RecordBlogView::dispatchSync($blogB->id, null, 'visitor-x');
 
         expect(BlogView::count())->toBe(2);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Error handling
+// ---------------------------------------------------------------------------
+
+describe('RecordBlogView — Error handling', function () {
+    it('logs a warning when the job fails', function () {
+        Log::spy();
+
+        $blog = Blog::factory()->published()->create();
+        $job = new RecordBlogView($blog->id, null, 'test-visitor-hash');
+
+        $job->failed(new \RuntimeException('Something went wrong'));
+
+        Log::shouldHaveReceived('warning')
+            ->once()
+            ->with('Failed to record blog view', [
+                'blog_id' => $blog->id,
+                'user_id' => null,
+                'visitor_hash' => 'test-visitor-hash',
+                'error' => 'Something went wrong',
+            ]);
     });
 });
