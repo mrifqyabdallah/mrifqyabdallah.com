@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class RecordBlogView implements ShouldQueue
 {
@@ -25,6 +27,16 @@ class RecordBlogView implements ShouldQueue
         } else {
             $this->recordForGuest();
         }
+    }
+
+    public function failed(Throwable $e): void
+    {
+        Log::warning('Failed to record blog view', [
+            'blog_id' => $this->blogId,
+            'user_id' => $this->userId,
+            'visitor_hash' => $this->visitorHash,
+            'error' => $e->getMessage(),
+        ]);
     }
 
     private function recordForAuthUser(): void
