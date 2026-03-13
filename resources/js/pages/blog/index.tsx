@@ -13,16 +13,7 @@ interface Props {
     tag: string;
 }
 
-interface SharedProps {
-    flash: {
-        not_found?: string;
-        success?: string;
-    };
-}
-
 export default function BlogIndex({ blogs: initialBlogs, search: initialSearch, tag: initialTag }: Props) {
-    const { flash } = usePage<SharedProps>().props;
-
     const [blogs, setBlogs]       = useState<Blog[]>(initialBlogs.data);
     const [nextCursor, setCursor] = useState<string | null>(initialBlogs.next_cursor);
     const [loading, setLoading]   = useState(false);
@@ -149,13 +140,6 @@ export default function BlogIndex({ blogs: initialBlogs, search: initialSearch, 
                             Want to contribute? read here
                         </Link>
                     </div>
-
-                    {/* Not found flash */}
-                    {flash?.not_found && (
-                        <div className="mb-8 px-4 py-3 rounded-lg bg-muted text-sm text-muted-foreground border">
-                            {flash.not_found}
-                        </div>
-                    )}
 
                     {/* Search + filter bar */}
                     <div className="mb-8 space-y-3">
