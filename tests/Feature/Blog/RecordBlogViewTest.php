@@ -4,9 +4,6 @@ use App\Jobs\RecordBlogView;
 use App\Models\Blog;
 use App\Models\BlogView;
 use App\Models\User;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 // ---------------------------------------------------------------------------
 // Guest view deduplication

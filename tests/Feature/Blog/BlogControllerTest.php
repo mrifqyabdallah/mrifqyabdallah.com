@@ -21,7 +21,7 @@ describe('GET /blog', function () {
         $this->get(route('blog.index'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('Blog/Index')
+                ->component('blog/index')
                 ->has('blogs.data', 3)
             );
     });
@@ -86,7 +86,7 @@ describe('GET /blog/{slug}', function () {
         $this->get(route('blog.show', $blog->slug))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('Blog/Show')
+                ->component('blog/show')
                 ->where('blog.slug', $blog->slug)
                 ->where('isArchived', false)
             );
@@ -100,10 +100,15 @@ describe('GET /blog/{slug}', function () {
             ->assertInertia(fn ($page) => $page->where('isArchived', true));
     });
 
-    it('redirects to blog index with flash message when slug not found', function () {
+    it('returns 404 with latest blogs when slug not found', function () {
+        Blog::factory()->published()->count(3)->create();
+
         $this->get(route('blog.show', 'non-existent-slug'))
-            ->assertRedirect(route('blog.index'))
-            ->assertSessionHas('not_found');
+            ->assertStatus(404)
+            ->assertInertia(fn ($page) => $page
+                ->component('blog/not-found')
+                ->has('latest', 3)
+            );
     });
 
     it('dispatches RecordBlogView job for guests', function () {

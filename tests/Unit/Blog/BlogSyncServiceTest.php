@@ -115,12 +115,10 @@ MD;
         expect($this->service->parseFile('2026-03-11-test.md', $contents))->toBeNull();
     });
 
-    it('normalises single tag string to array', function () {
+    it('returns null when tags is not array', function () {
         $contents = "---\ntitle: Test\ncreator: x\nexcerpt: y\ntags: laravel\n---\nBody here";
 
-        $result = $this->service->parseFile('2026-03-11-test.md', $contents);
-
-        expect($result['tags'])->toBe(['laravel']);
+        expect($this->service->parseFile('2026-03-11-test.md', $contents))->toBeNull();
     });
 });
 
@@ -171,13 +169,8 @@ MD;
     it('reports invalid tags format', function () {
         $contents = "---\ntitle: T\ncreator: x\nexcerpt: y\ntags: not-an-array\n---\nBody";
 
-        // Single string tags are normalised to array in parse, but validate is strict
-        // Tags as a plain string (not yaml list) should fail
         $errors = $this->service->validateFrontmatter('2026-03-11-test.md', $contents);
 
-        // A plain string value passes the is_array check so won't error,
-        // but an explicitly invalid type like a number would
-        // This test confirms no false positives on plain string tags
-        expect($errors)->not->toContain('Invalid tags format: must be an array, e.g. [laravel, php]');
+        expect($errors)->toContain('Invalid tags format: must be an array, e.g. [laravel, php]');
     });
 });
