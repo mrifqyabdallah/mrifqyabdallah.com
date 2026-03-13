@@ -75,4 +75,6 @@ jobs:
             docker compose pull
             docker compose up -d
             docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan blog:sync
+            docker compose exec -T app php artisan sitemap:generate
             docker image prune -f
