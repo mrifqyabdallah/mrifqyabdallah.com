@@ -83,4 +83,4 @@ Push your branch and open a PR against `main`. The CI check will validate your f
 
 ## Questions?
 
-Open an issue or start a discussion on GitHub. I'm looking forward to reading what you write.
+Open an issue or start a discussion on GitHub. I'm looking forward to read what you write.
