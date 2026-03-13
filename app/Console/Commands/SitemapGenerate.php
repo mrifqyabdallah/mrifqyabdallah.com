@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Blog;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 
 class SitemapGenerate extends Command
 {
@@ -13,13 +14,14 @@ class SitemapGenerate extends Command
 
     public function handle(): int
     {
-        $baseUrl = rtrim(config('app.url'), '/');
+        $baseUrl = rtrim(config()->string('app.url'), '/');
 
         $blogs = Blog::query()
             ->published()
             ->orderBy('published_at', 'desc')
             ->get(['slug', 'published_at']);
 
+        /** @var Collection<int, string> $urls */
         $urls = collect();
 
         // Static pages
@@ -34,7 +36,7 @@ class SitemapGenerate extends Command
             ));
         }
 
-        $xml = $this->buildXml($urls->all());
+        $xml = $this->buildXml($urls);
 
         file_put_contents(public_path('sitemap.xml'), $xml);
 
@@ -55,9 +57,10 @@ class SitemapGenerate extends Command
 XML;
     }
 
-    private function buildXml(array $urls): string
+    /** @param Collection<int, string> $urls */
+    private function buildXml(Collection $urls): string
     {
-        $urlsString = implode("\n", $urls);
+        $urlsString = $urls->implode("\n");
 
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>

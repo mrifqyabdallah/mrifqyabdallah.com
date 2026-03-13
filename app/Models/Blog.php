@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static Builder<Blog> published()
+ * @method static Builder<Blog> archived()
+ * @method static Builder<Blog> whereTagged(string $tag)
+ * @method static Builder<Blog> search(string $term)
+ */
 class Blog extends Model
 {
     /** @use HasFactory<\Database\Factories\BlogFactory> */
@@ -28,28 +34,32 @@ class Blog extends Model
         return $this->hasMany(BlogView::class);
     }
 
+    /** @param Builder<Blog> $query */
     #[Scope]
-    public function published(Builder $query): void
+    protected function published(Builder $query): void
     {
         $query->where('status', BlogStatus::Published);
     }
 
+    /** @param Builder<Blog> $query */
     #[Scope]
-    public function archived(Builder $query): void
+    protected function archived(Builder $query): void
     {
         $query->where('status', BlogStatus::Archived);
     }
 
+    /** @param Builder<Blog> $query */
     #[Scope]
-    public function whereTagged(Builder $query, string $tag): void
+    protected function whereTagged(Builder $query, string $tag): void
     {
         $query->whereJsonContains('tags', $tag);
     }
 
+    /** @param Builder<Blog> $query */
     #[Scope]
-    public function search(Builder $query, string $term): void
+    protected function search(Builder $query, string $term): void
     {
-        $query->where(function ($q) use ($term) {
+        $query->where(function (Builder $q) use ($term) {
             $q->whereRaw(
                 "to_tsvector('english', coalesce(title,'') || ' ' || coalesce(excerpt,'') || ' ' || coalesce(content,'')) @@ plainto_tsquery('english', ?)",
                 [$term]

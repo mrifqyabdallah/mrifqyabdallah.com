@@ -15,14 +15,14 @@ class BlogFeedController extends Controller
             ->limit(50)
             ->get(['slug', 'title', 'excerpt', 'creator', 'tags', 'published_at']);
 
-        $appName = config('app.name');
-        $now = now()->toRfc2822String();
-
         $items = $blogs->map(function (Blog $blog) {
             $url = route('blog.show', ['slug' => $blog->slug]);
             $pubDate = $blog->published_at->toRfc2822String();
-            $tags = collect($blog->tags)
-                ->map(fn ($t) => "<category>{$t}</category>")
+            
+            /** @var array<int, string> $blogTags */
+            $blogTags = $blog->tags ?? [];
+            $tags = collect($blogTags)
+                ->map(fn ($tag) => "<category>{(string) $tag}</category>")
                 ->implode("\n      ");
             $excerpt = htmlspecialchars($blog->excerpt, ENT_XML1);
 
@@ -39,8 +39,11 @@ class BlogFeedController extends Controller
 XML;
         })->implode("\n");
 
+        $appName = config()->string('app.name');
+        $now = now()->toRfc2822String();
         $routeIndex = route('blog.index');
         $routeFeed = route('blog.feed');
+
         $xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

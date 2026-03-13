@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\BlogStatus;
 use App\Jobs\RecordBlogView;
 use App\Models\Blog;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -19,8 +20,8 @@ class BlogController extends Controller
 
         $blogs = Blog::query()
             ->published()
-            ->when($search, fn ($q) => $q->search($search))
-            ->when($tag, fn ($q) => $q->whereTagged($tag))
+            ->when($search, fn (Builder $q): Builder => $q->search($search))
+            ->when($tag, fn (Builder $q): Builder => $q->whereTagged($tag))
             ->orderBy('published_at', 'desc')
             ->cursorPaginate(10)
             ->withQueryString();
@@ -32,10 +33,10 @@ class BlogController extends Controller
     {
         $blog = Blog::where('slug', $slug)->first();
 
-        if (! $blog) {
-            return redirect()
-                ->route('blog.index', status: 404)
-                ->with('not_found', 'This blog post wasn\'t found. Here are some you might like.');
+        if (!$blog) {
+            session()->flash('not_found', 'This blog post wasn\'t found. Here are some you might like.');
+
+            return $this->index($request)->toResponse($request)->setStatusCode(404);
         }
 
         RecordBlogView::dispatch(
