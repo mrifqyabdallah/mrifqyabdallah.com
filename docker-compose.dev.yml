@@ -13,6 +13,7 @@ services:
     volumes:
       - .:/app
       - ./docker/frankenphp/Caddyfile.dev:/etc/frankenphp/Caddyfile:ro
+      - ./docker/supervisor/supervisord.dev.conf:/etc/supervisor/conf.d/supervisord.conf:ro
       - ./docker/frankenphp/entrypoint.dev.sh:/entrypoint.dev.sh:ro
     ports:
       - "80:80"

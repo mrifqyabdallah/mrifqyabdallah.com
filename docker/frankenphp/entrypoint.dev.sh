@@ -24,5 +24,5 @@ fi
 # Start Vite dev server in the background
 npm run dev &
 
-# Start FrankenPHP in the foreground
-exec frankenphp run --config /etc/frankenphp/Caddyfile
+# Start supervisord (manages FrankenPHP + queue worker)
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
