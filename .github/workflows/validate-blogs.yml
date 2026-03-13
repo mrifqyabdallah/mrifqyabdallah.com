@@ -5,6 +5,9 @@ on:
     paths:
       - 'resources/blogs/**.md'
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate blog markdown files
