@@ -88,6 +88,7 @@ class BlogSyncService
 
         // Validate it's a real date
         try {
+            Carbon::parse($dateString);
             $date = Carbon::createFromFormat('Y-m-d', $dateString)?->startOfDay();
         } catch (\Exception) {
             return null;
