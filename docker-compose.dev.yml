@@ -19,17 +19,9 @@ services:
       - "443:443"
       - "5173:5173"
     environment:
-      APP_ENV: local
-      APP_DEBUG: "true"
-      APP_URL: http://${APP_HOST:-mrifqyabdallah.test}
-      DB_CONNECTION: pgsql
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: ${DB_DATABASE:-mrifqyabdallah}
-      DB_USERNAME: ${DB_USERNAME:-laravel}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
-      VITE_DEV_SERVER_URL: http://${APP_HOST:-mrifqyabdallah.test}:5173
       APP_HOST: ${APP_HOST:-mrifqyabdallah.test}
+      APP_URL: http://${APP_HOST:-mrifqyabdallah.test}
+      VITE_DEV_SERVER_URL: http://${APP_HOST:-mrifqyabdallah.test}:5173
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,6 +45,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
     ports:
       - "5432:5432"
     healthcheck:
