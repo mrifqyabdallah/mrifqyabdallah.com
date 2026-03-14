@@ -66,17 +66,17 @@
             "vendor/bin/phpstan --memory-limit=2G"
         ],
         "lint": [
-            "pint --parallel",
-            "npm run lint"
+            "pint --parallel"
         ],
         "test:lint": [
             "pint --parallel --test"
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@test:lint",
             "@php artisan test",
-            "npm run lint"
+            "@lint",
+            "npm run lint",
+            "npm run format"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
