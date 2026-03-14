@@ -46,8 +46,9 @@ class BlogController extends Controller
 
         return Inertia::render('blog/show', [
             'blog' => $blog->only([
-                'slug', 'title', 'creator', 'excerpt',
-                'content', 'tags', 'status', 'published_at',
+                'id', 'slug', 'title', 'creator', 'excerpt',
+                'tags', 'status', 'published_at',
+                ...($blog->status === BlogStatus::Published ? ['content'] : []),
             ]),
             'viewCount' => $blog->view_count,
             'isArchived' => $blog->status == BlogStatus::Archived,
