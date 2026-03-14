@@ -114,7 +114,7 @@ Prompts for confirmation, then removes all containers and volumes (including the
 3. Enable the proxy (orange cloud ☁️)
 4. Add a CNAME targeting the root (`@`) of your domain
 5. Try to open your domain now. It should shows the Cloudflare error page with the server indicated as down.
-6. Setup API token by following the steps we have in .env.example on the `CF_DNS_API_TOKEN` variable
+6. Setup API token by following the steps we have in .env.example on the `CFCACHE_API_TOKEN` variable
 
 ### Add GitHub Actions secrets
 
@@ -160,7 +160,7 @@ APP_DEBUG=false
 
 APP_KEY=             # generate locally then copy-paste
 DB_PASSWORD=         # use a strong password
-CF_DNS_API_TOKEN=    # CloudFlare API token
+CFCACHE_API_TOKEN=    # CloudFlare API token
 ACME_EMAIL=          # your email for Let's Encrypt
 ```
 
