@@ -1,14 +1,16 @@
-import React, { useEffect, useState, useMemo } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import ReactMarkdown, { Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
 import { Tag, Eye, Calendar, User, ArrowLeft, AlertTriangle, Trash2 } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import type { Components } from "react-markdown";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import BlogLayout from '@/layouts/blog-layout';
 import { index, destroy } from '@/routes/blog';
-import { Blog } from '@/types/blog';
+import type { Blog } from '@/types/blog';
 
 interface Props {
     blog: Blog;
@@ -24,20 +26,12 @@ interface SharedProps {
     };
 }
 
-// -----------------------------------------------------------------------------
-// Slug utility — pure function, no instance state, always deterministic
-// -----------------------------------------------------------------------------
-
 function slugify(text: string): string {
     return text
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^\w-]/g, '');
 }
-
-// -----------------------------------------------------------------------------
-// Heading extraction
-// -----------------------------------------------------------------------------
 
 interface TocItem {
     id: string;
@@ -58,10 +52,6 @@ function extractHeadings(content: string): TocItem[] {
 
     return items;
 }
-
-// -----------------------------------------------------------------------------
-// TableOfContents
-// -----------------------------------------------------------------------------
 
 function TableOfContents({ items }: { items: TocItem[] }) {
     const [activeId, setActiveId] = useState<string>('');
@@ -144,10 +134,6 @@ function TableOfContents({ items }: { items: TocItem[] }) {
     );
 }
 
-// -----------------------------------------------------------------------------
-// Page
-// -----------------------------------------------------------------------------
-
 export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     const { auth } = usePage<SharedProps>().props;
     const isAdmin  = auth?.user?.is_admin ?? false;
@@ -167,7 +153,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     };
 
     return (
-        <>
+        <BlogLayout style={{ '--fade-w': '70%', '--fade-h': '70%' } as React.CSSProperties}>
             <Head>
                 <title>{blog.title}</title>
                 <meta name="description" content={blog.excerpt} />
@@ -181,118 +167,106 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                 ))}
             </Head>
 
-            <div className="min-h-screen bg-background">
-                <div className="max-w-6xl mx-auto px-4 py-16">
-                    <div className="flex gap-16">
+            <div className="max-w-6xl mx-auto px-4 py-16">
+                <div className="flex gap-16">
 
-                        {/* Main content */}
-                        <div className="min-w-0 flex-1 max-w-3xl">
+                    {/* Main content */}
+                    <div className="min-w-0 flex-1 max-w-3xl">
 
-                            {/* Back link */}
-                            <Link
-                                href={index().url}
-                                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
-                            >
-                                <ArrowLeft className="w-3.5 h-3.5" />
-                                All posts
-                            </Link>
+                        <Link
+                            href={index().url}
+                            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            All posts
+                        </Link>
 
-                            {/* Archived warning */}
-                            {isArchived && (
-                                <Alert className="mb-8 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
-                                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                    <AlertDescription className="text-amber-800 dark:text-amber-300">
-                                        Sorry, this post has been archived and no longer available.
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            {/* Header */}
-                            <header className="mb-10">
-                                <h1 className="text-4xl font-bold tracking-tight leading-tight mb-4">
-                                    {blog.title}
-                                </h1>
-
-                                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                                    {blog.excerpt}
-                                </p>
-
-                                {/* Meta row */}
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pb-6 border-b border-border">
-                                    <span className="inline-flex items-center gap-1.5">
-                                        <User className="w-3.5 h-3.5" />
-                                        {blog.creator}
-                                    </span>
-                                    <span className="inline-flex items-center gap-1.5">
-                                        <Calendar className="w-3.5 h-3.5" />
-                                        <time dateTime={blog.published_at}>{publishedDate}</time>
-                                    </span>
-                                    <span className="inline-flex items-center gap-1.5">
-                                        <Eye className="w-3.5 h-3.5" />
-                                        {viewCount.toLocaleString()} {viewCount > 1 ? "views" : "view"}
-                                    </span>
-
-                                    {/* Admin: archive button */}
-                                    {isAdmin && !isArchived && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={handleDelete}
-                                            className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                            Archive
-                                        </Button>
-                                    )}
-                                </div>
-
-                                {/* Tags */}
-                                {blog.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 pt-5">
-                                        {blog.tags.map((tag) => (
-                                            <Link key={tag} href={index({ query: { tag: tag } }).url}>
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="gap-1 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
-                                                >
-                                                    <Tag className="w-3 h-3" />
-                                                    {tag}
-                                                </Badge>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </header>
-
-                            {/* Markdown content */}
-                            {isArchived ? (
-                                <div className="opacity-60 pointer-events-none select-none">
-                                    <MarkdownContent content={blog.content} />
-                                </div>
-                            ) : (
-                                <MarkdownContent content={blog.content} />
-                            )}
-                        </div>
-
-                        {/* TOC sidebar — only on xl screens */}
-                        {tocItems.length > 0 && (
-                            <aside className="hidden xl:block w-56 shrink-0">
-                                <div className="sticky top-16">
-                                    <TableOfContents items={tocItems} />
-                                </div>
-                            </aside>
+                        {isArchived && (
+                            <Alert className="mb-8 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
+                                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <AlertDescription className="text-amber-800 dark:text-amber-300">
+                                    Sorry, this post has been archived and no longer available.
+                                </AlertDescription>
+                            </Alert>
                         )}
 
+                        <header className={`mb-10 ${isArchived && "opacity-25 pointer-events-none select-none"}`}>
+                            <h1 className="text-4xl font-bold tracking-tight leading-tight mb-4">
+                                {blog.title}
+                            </h1>
+
+                            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                                {blog.excerpt}
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pb-6 border-b-3 border-neutral-300 dark:border-neutral-600">
+                                <span className="inline-flex items-center gap-1.5">
+                                    <User className="w-3.5 h-3.5" />
+                                    {blog.creator}
+                                </span>
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    <time dateTime={blog.published_at}>{publishedDate}</time>
+                                </span>
+                                <span className="inline-flex items-center gap-1.5">
+                                    <Eye className="w-3.5 h-3.5" />
+                                    {viewCount.toLocaleString()} {viewCount > 1 ? "views" : "view"}
+                                </span>
+
+                                {isAdmin && !isArchived && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleDelete}
+                                        className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        Archive
+                                    </Button>
+                                )}
+                            </div>
+
+                            {blog.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 pt-5">
+                                    {blog.tags.map((tag) => (
+                                        <Link key={tag} href={index({ query: { tag: tag } }).url}>
+                                            <Badge
+                                                variant="secondary"
+                                                className="gap-1 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                                            >
+                                                <Tag className="w-3 h-3" />
+                                                {tag}
+                                            </Badge>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </header>
+
+                        {!isArchived && <MarkdownContent content={blog.content} />}
                     </div>
+
+                    {/* TOC sidebar */}
+                    {tocItems.length > 0 && (
+                        <aside className="hidden xl:block w-56 shrink-0">
+                            <div
+                                className="sticky top-16 rounded-lg p-4"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>")`,
+                                    backgroundRepeat: 'repeat',
+                                    backgroundSize: '200px 200px',
+                                }}
+                            >
+                                <TableOfContents items={tocItems} />
+                            </div>
+                        </aside>
+                    )}
+
                 </div>
             </div>
-        </>
+        </BlogLayout>
     );
 }
-
-// -----------------------------------------------------------------------------
-// MarkdownContent
-// -----------------------------------------------------------------------------
 
 interface MarkdownContentProps {
     content: string;
@@ -339,10 +313,10 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                 return <p {...props}>{children}</p>;
             },
         };
-    }, [content]);
+    }, []);
 
     return (
-        <div className="prose prose-neutral dark:prose-invert prose-lg max-w-none
+        <div className="prose prose-neutral dark:prose-invert prose-base max-w-none
             prose-headings:font-bold prose-headings:tracking-tight
             prose-a:text-primary prose-a:underline
             prose-code:before:content-none prose-code:after:content-none

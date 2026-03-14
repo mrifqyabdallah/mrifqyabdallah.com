@@ -1,11 +1,12 @@
+import { Head, Link, router } from "@inertiajs/react";
+import { Search, Tag, X, Rss } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Search, Tag, X, Rss, ArrowLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { index, show, feed } from '@/routes/blog';
-import { Blog, PaginatedBlogs } from '@/types/blog'
 import AppLogoIcon from '@/components/app-logo-icon';
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import BlogLayout from '@/layouts/blog-layout';
+import { index, show, feed } from '@/routes/blog';
+import type { Blog, PaginatedBlogs } from '@/types/blog';
 
 interface Props {
     blogs: PaginatedBlogs;
@@ -107,125 +108,118 @@ export default function BlogIndex({ blogs: initialBlogs, search: initialSearch, 
     const hasFilters = search || tag;
 
     return (
-        <>
+        <BlogLayout>
             <Head title="Blog" />
 
-            <div className="min-h-screen bg-background">
-                <div className="max-w-3xl mx-auto px-4 py-16">
+            <div className="max-w-3xl mx-auto px-4 py-16">
 
-                    {/* Header */}
-                    <div className="mb-12">
-                        <div className="flex items-center gap-x-2 mb-2">
-                            <a
-                                href="/"
-                                title="Back to Homepage"
-                            >
-                                <AppLogoIcon className="size-8" />
-                            </a>
-                            <h1 className="text-4xl font-bold tracking-tight">Community Blog</h1>
-                            <a
-                                href={feed().url}
-                                className="text-muted-foreground hover:text-foreground transition-colors ml-auto"
-                                title="RSS Feed"
-                            >
-                                <Rss className="w-5 h-5" />
-                            </a>
-                        </div>
-                        <p className="text-muted-foreground mb-2    ">
-                            Thoughts, guides, and contributions from the community.
-                        </p>
-                        <Link className="text-muted-foreground text-xs italic"
-                            href="/blog/welcome-and-how-to-contribute"
+                {/* Header */}
+                <div className="mb-12">
+                    <div className="flex items-center gap-x-2 mb-2">
+                        <a href="/" title="Back to Homepage">
+                            <AppLogoIcon className="size-8" />
+                        </a>
+                        <h1 className="text-4xl font-bold tracking-tight">Community Blog</h1>
+                        <a
+                            href={feed().url}
+                            className="text-muted-foreground hover:text-foreground transition-colors ml-auto"
+                            title="RSS Feed"
                         >
-                            Want to contribute? read here
-                        </Link>
+                            <Rss className="w-5 h-5" />
+                        </a>
                     </div>
+                    <p className="text-muted-foreground mb-2">
+                        Thoughts, guides, and contributions from the community.
+                    </p>
+                    <Link className="text-muted-foreground text-xs italic" href="/blog/welcome-and-how-to-contribute">
+                        Want to contribute? read here
+                    </Link>
+                </div>
 
-                    {/* Search + filter bar */}
-                    <div className="mb-8 space-y-3">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                            <Input
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search posts..."
-                                className="pl-9"
-                            />
-                            {search && (
-                                <button
-                                    onClick={() => setSearch("")}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-
-                        {tag && (
-                            <div className="flex items-center gap-2 text-sm">
-                                <span className="text-muted-foreground">Filtered by tag:</span>
-                                <Badge
-                                    variant="secondary"
-                                    className="gap-1 cursor-pointer hover:bg-destructive hover:text-white transition-colors"
-                                    onClick={() => setTag("")}
-                                >
-                                    <Tag className="w-3 h-3" />
-                                    {tag}
-                                    <X className="w-3 h-3" />
-                                </Badge>
-                            </div>
-                        )}
-
-                        {hasFilters && (
+                {/* Search + filter bar */}
+                <div className="mb-8 space-y-3">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search posts..."
+                            className="pl-9 border-2 border-neutral-300 dark:border-neutral-600"
+                        />
+                        {search && (
                             <button
-                                onClick={clearFilters}
-                                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+                                onClick={() => setSearch("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             >
-                                Clear all filters
+                                <X className="w-4 h-4" />
                             </button>
                         )}
                     </div>
 
-                    {/* Blog list */}
-                    {blogs.length === 0 ? (
-                        <div className="text-center py-20 text-muted-foreground">
-                            <p className="text-lg mb-1">No posts found</p>
-                            {hasFilters && (
-                                <p className="text-sm">
-                                    Try a different search term or{" "}
-                                    <button
-                                        onClick={clearFilters}
-                                        className="underline underline-offset-2 hover:text-foreground transition-colors"
-                                    >
-                                        clear filters
-                                    </button>
-                                </p>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-border">
-                            {blogs.map((blog) => (
-                                <BlogCard
-                                    key={blog.slug}
-                                    blog={blog}
-                                    onTagClick={(t) => { setTag(t); setSearch(""); }}
-                                />
-                            ))}
+                    {tag && (
+                        <div className="flex items-center gap-2 text-sm">
+                            <span className="text-muted-foreground">Filtered by tag:</span>
+                            <Badge
+                                variant="secondary"
+                                className="gap-1 cursor-pointer hover:bg-destructive hover:text-white transition-colors"
+                                onClick={() => setTag("")}
+                            >
+                                <Tag className="w-3 h-3" />
+                                {tag}
+                                <X className="w-3 h-3" />
+                            </Badge>
                         </div>
                     )}
 
-                    {/* Infinite scroll sentinel */}
-                    <div ref={sentinelRef} className="py-4 flex justify-center">
-                        {loading && (
-                            <div className="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
-                        )}
-                        {!loading && !nextCursor && blogs.length > 0 && (
-                            <p className="text-xs text-muted-foreground">You've reached the end.</p>
+                    {hasFilters && (
+                        <button
+                            onClick={clearFilters}
+                            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+                        >
+                            Clear all filters
+                        </button>
+                    )}
+                </div>
+
+                {/* Blog list */}
+                {blogs.length === 0 ? (
+                    <div className="text-center py-20 text-muted-foreground">
+                        <p className="text-lg mb-1">No posts found</p>
+                        {hasFilters && (
+                            <p className="text-sm">
+                                Try a different search term or{" "}
+                                <button
+                                    onClick={clearFilters}
+                                    className="underline underline-offset-2 hover:text-foreground transition-colors"
+                                >
+                                    clear filters
+                                </button>
+                            </p>
                         )}
                     </div>
+                ) : (
+                    <div className="divide-y divide-neutral-300 dark:divide-neutral-600">
+                        {blogs.map((blog) => (
+                            <BlogCard
+                                key={blog.slug}
+                                blog={blog}
+                                onTagClick={(t) => { setTag(t); setSearch(""); }}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Infinite scroll sentinel */}
+                <div ref={sentinelRef} className="py-4 flex justify-center">
+                    {loading && (
+                        <div className="w-5 h-5 border-2 border-border border-t-foreground rounded-full animate-spin" />
+                    )}
+                    {!loading && !nextCursor && blogs.length > 0 && (
+                        <p className="text-xs text-muted-foreground">You've reached the end.</p>
+                    )}
                 </div>
             </div>
-        </>
+        </BlogLayout>
     );
 }
 
