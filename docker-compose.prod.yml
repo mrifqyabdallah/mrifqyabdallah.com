@@ -9,6 +9,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
+      APP_NAME: mrifqyabdallah
       APP_ENV: production
       APP_DEBUG: "false"
       APP_URL: https://${APP_HOST:-mrifqyabdallah.com}
@@ -20,6 +21,8 @@ services:
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD}
       APP_HOST: ${APP_HOST:-mrifqyabdallah.com}
+      CFCACHE_API_TOKEN: ${CFCACHE_API_TOKEN}
+      CFCACHE_ZONE_ID: ${CFCACHE_ZONE_ID}
       ACME_EMAIL: ${ACME_EMAIL}
       PHP_INI_SCAN_DIR: /usr/local/etc/php/conf.d
     depends_on:
