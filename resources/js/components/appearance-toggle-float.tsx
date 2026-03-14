@@ -42,7 +42,10 @@ export default function AppearanceToggleFloat({
     return (
         <div
             ref={ref}
-            className={cn('fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2', className)}
+            className={cn(
+                'fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2',
+                className,
+            )}
             {...props}
         >
             {/* Option buttons — slide up when open */}
@@ -62,7 +65,7 @@ export default function AppearanceToggleFloat({
                             setOpen(false);
                         }}
                         className={cn(
-                            'flex items-center gap-2 rounded-full py-1.5 pl-3 pr-4 text-sm shadow-md transition-colors',
+                            'flex items-center gap-2 rounded-full py-1.5 pr-4 pl-3 text-sm shadow-md transition-colors',
                             appearance === value
                                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
                                 : 'bg-white text-neutral-600 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700',
