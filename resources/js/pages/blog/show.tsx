@@ -1,13 +1,21 @@
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Tag, Eye, Calendar, User, ArrowLeft, AlertTriangle, Trash2 } from "lucide-react";
-import React, { useEffect, useState, useMemo } from "react";
-import type { Components } from "react-markdown";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import {
+    Tag,
+    Eye,
+    Calendar,
+    User,
+    ArrowLeft,
+    AlertTriangle,
+    Trash2,
+} from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import type { Components } from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import BlogLayout from '@/layouts/blog-layout';
 import { index, destroy } from '@/routes/blog';
 import type { Blog } from '@/types/blog';
@@ -46,7 +54,7 @@ function extractHeadings(content: string): TocItem[] {
 
     while ((match = regex.exec(content)) !== null) {
         const level = match[1].length;
-        const text  = match[2].trim();
+        const text = match[2].trim();
         items.push({ id: slugify(text), text, level });
     }
 
@@ -88,16 +96,17 @@ function TableOfContents({ items }: { items: TocItem[] }) {
 
     if (items.length === 0) return null;
 
-    const minLevel = Math.min(...items.map(i => i.level));
+    const minLevel = Math.min(...items.map((i) => i.level));
 
     const handleClick = (id: string) => {
         const el = document.getElementById(id);
         if (!el) return;
 
-        const top = el.getBoundingClientRect().top
-            + window.scrollY
-            - (window.innerHeight / 2)
-            + (el.offsetHeight / 2);
+        const top =
+            el.getBoundingClientRect().top +
+            window.scrollY -
+            window.innerHeight / 2 +
+            el.offsetHeight / 2;
 
         window.scrollTo({ top, behavior: 'smooth' });
         window.history.pushState(null, '', `#${id}`);
@@ -106,11 +115,11 @@ function TableOfContents({ items }: { items: TocItem[] }) {
 
     return (
         <nav className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+            <p className="mb-3 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                 On this page
             </p>
             {items.map((item) => {
-                const indent   = (item.level - minLevel) * 12;
+                const indent = (item.level - minLevel) * 12;
                 const isActive = activeId === item.id;
 
                 return (
@@ -119,11 +128,11 @@ function TableOfContents({ items }: { items: TocItem[] }) {
                         style={{ paddingLeft: `${indent}px` }}
                         onClick={() => handleClick(item.id)}
                         className={[
-                            "block w-full text-left text-sm py-0.5 transition-colors truncate cursor-pointer",
-                            "hover:text-foreground",
+                            'block w-full cursor-pointer truncate py-0.5 text-left text-sm transition-colors',
+                            'hover:text-foreground',
                             isActive
-                                ? "text-foreground font-bold"
-                                : "text-muted-foreground font-normal",
+                                ? 'font-bold text-foreground'
+                                : 'font-normal text-muted-foreground',
                         ].join(' ')}
                     >
                         {item.text}
@@ -136,81 +145,99 @@ function TableOfContents({ items }: { items: TocItem[] }) {
 
 export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     const { auth } = usePage<SharedProps>().props;
-    const isAdmin  = auth?.user?.is_admin ?? false;
+    const isAdmin = auth?.user?.is_admin ?? false;
 
     const tocItems = extractHeadings(blog.content);
 
-    const publishedDate = new Date(blog.published_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+    const publishedDate = new Date(blog.published_at).toLocaleDateString(
+        'en-US',
+        {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        },
+    );
 
     const handleDelete = () => {
-        if (confirm(`Archive "${blog.title}"? It will no longer appear in the blog list.`)) {
+        if (
+            confirm(
+                `Archive "${blog.title}"? It will no longer appear in the blog list.`,
+            )
+        ) {
             router.delete(destroy(blog.id).url);
         }
     };
 
     return (
-        <BlogLayout style={{ '--fade-w': '70%', '--fade-h': '70%' } as React.CSSProperties}>
+        <BlogLayout
+            style={
+                { '--fade-w': '70%', '--fade-h': '70%' } as React.CSSProperties
+            }
+        >
             <Head>
                 <title>{blog.title}</title>
                 <meta name="description" content={blog.excerpt} />
                 <meta property="og:title" content={blog.title} />
                 <meta property="og:description" content={blog.excerpt} />
                 <meta property="og:type" content="article" />
-                <meta property="article:published_time" content={blog.published_at} />
+                <meta
+                    property="article:published_time"
+                    content={blog.published_at}
+                />
                 <meta property="article:author" content={blog.creator} />
                 {blog.tags.map((tag) => (
                     <meta key={tag} property="article:tag" content={tag} />
                 ))}
             </Head>
 
-            <div className="max-w-6xl mx-auto px-4 py-16">
+            <div className="mx-auto max-w-6xl px-4 py-16">
                 <div className="flex gap-16">
-
                     {/* Main content */}
-                    <div className="min-w-0 flex-1 max-w-3xl">
-
+                    <div className="max-w-3xl min-w-0 flex-1">
                         <Link
                             href={index().url}
-                            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
+                            className="mb-10 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
                         >
-                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <ArrowLeft className="h-3.5 w-3.5" />
                             All posts
                         </Link>
 
                         {isArchived && (
                             <Alert className="mb-8 border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
-                                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                 <AlertDescription className="text-amber-800 dark:text-amber-300">
-                                    Sorry, this post has been archived and no longer available.
+                                    Sorry, this post has been archived and no
+                                    longer available.
                                 </AlertDescription>
                             </Alert>
                         )}
 
-                        <header className={`mb-10 ${isArchived && "opacity-25 pointer-events-none select-none"}`}>
-                            <h1 className="text-4xl font-bold tracking-tight leading-tight mb-4">
+                        <header
+                            className={`mb-10 ${isArchived && 'pointer-events-none opacity-25 select-none'}`}
+                        >
+                            <h1 className="mb-4 text-4xl leading-tight font-bold tracking-tight">
                                 {blog.title}
                             </h1>
 
-                            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                            <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
                                 {blog.excerpt}
                             </p>
 
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pb-6 border-b-3 border-neutral-300 dark:border-neutral-600">
+                            <div className="flex flex-wrap items-center gap-4 border-b-3 border-neutral-300 pb-6 text-sm text-muted-foreground dark:border-neutral-600">
                                 <span className="inline-flex items-center gap-1.5">
-                                    <User className="w-3.5 h-3.5" />
+                                    <User className="h-3.5 w-3.5" />
                                     {blog.creator}
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
-                                    <Calendar className="w-3.5 h-3.5" />
-                                    <time dateTime={blog.published_at}>{publishedDate}</time>
+                                    <Calendar className="h-3.5 w-3.5" />
+                                    <time dateTime={blog.published_at}>
+                                        {publishedDate}
+                                    </time>
                                 </span>
                                 <span className="inline-flex items-center gap-1.5">
-                                    <Eye className="w-3.5 h-3.5" />
-                                    {viewCount.toLocaleString()} {viewCount > 1 ? "views" : "view"}
+                                    <Eye className="h-3.5 w-3.5" />
+                                    {viewCount.toLocaleString()}{' '}
+                                    {viewCount > 1 ? 'views' : 'view'}
                                 </span>
 
                                 {isAdmin && !isArchived && (
@@ -218,9 +245,9 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={handleDelete}
-                                        className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5"
+                                        className="ml-auto gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                     >
-                                        <Trash2 className="w-3.5 h-3.5" />
+                                        <Trash2 className="h-3.5 w-3.5" />
                                         Archive
                                     </Button>
                                 )}
@@ -229,12 +256,18 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                             {blog.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5 pt-5">
                                     {blog.tags.map((tag) => (
-                                        <Link key={tag} href={index({ query: { tag: tag } }).url}>
+                                        <Link
+                                            key={tag}
+                                            href={
+                                                index({ query: { tag: tag } })
+                                                    .url
+                                            }
+                                        >
                                             <Badge
                                                 variant="secondary"
-                                                className="gap-1 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                                                className="cursor-pointer gap-1 transition-colors hover:bg-primary hover:text-primary-foreground"
                                             >
-                                                <Tag className="w-3 h-3" />
+                                                <Tag className="h-3 w-3" />
                                                 {tag}
                                             </Badge>
                                         </Link>
@@ -243,12 +276,14 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                             )}
                         </header>
 
-                        {!isArchived && <MarkdownContent content={blog.content} />}
+                        {!isArchived && (
+                            <MarkdownContent content={blog.content} />
+                        )}
                     </div>
 
                     {/* TOC sidebar */}
                     {tocItems.length > 0 && (
-                        <aside className="hidden xl:block w-56 shrink-0">
+                        <aside className="hidden w-56 shrink-0 xl:block">
                             <div
                                 className="sticky top-16 rounded-lg p-4"
                                 style={{
@@ -261,7 +296,6 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                             </div>
                         </aside>
                     )}
-
                 </div>
             </div>
         </BlogLayout>
@@ -275,14 +309,18 @@ interface MarkdownContentProps {
 function MarkdownContent({ content }: MarkdownContentProps) {
     const components = useMemo<Components>(() => {
         const makeHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
-            return function Heading({ children }: { children: React.ReactNode }) {
+            return function Heading({
+                children,
+            }: {
+                children: React.ReactNode;
+            }) {
                 const id = slugify(String(children));
                 return React.createElement(
                     `h${level}`,
-                    { id, className: "scroll-mt-30" },
+                    { id, className: 'scroll-mt-30' },
                     <a href={`#${id}`} className="no-underline hover:underline">
                         {children}
-                    </a>
+                    </a>,
                 );
             };
         };
@@ -299,13 +337,13 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                 const match = text.match(/^::youtube\[([a-zA-Z0-9_-]+)\]$/);
                 if (match) {
                     return (
-                        <div className="relative aspect-video my-6 rounded-lg overflow-hidden border border-border">
+                        <div className="relative my-6 aspect-video overflow-hidden rounded-lg border border-border">
                             <iframe
                                 src={`https://www.youtube.com/embed/${match[1]}`}
                                 title="YouTube video"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
-                                className="absolute inset-0 w-full h-full"
+                                className="absolute inset-0 h-full w-full"
                             />
                         </div>
                     );
@@ -316,14 +354,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
     }, []);
 
     return (
-        <div className="prose prose-neutral dark:prose-invert prose-base max-w-none
-            prose-headings:font-bold prose-headings:tracking-tight
-            prose-a:text-primary prose-a:underline
-            prose-code:before:content-none prose-code:after:content-none
-            prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-            prose-pre:bg-muted prose-pre:border prose-pre:border-border
-            prose-img:rounded-lg prose-img:border prose-img:border-border
-        ">
+        <div className="prose prose-base max-w-none prose-neutral dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-a:underline prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-border prose-pre:bg-muted prose-img:rounded-lg prose-img:border prose-img:border-border">
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
