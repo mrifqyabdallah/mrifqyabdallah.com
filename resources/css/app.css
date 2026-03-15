@@ -228,6 +228,7 @@
     .prose :where(pre code):not(:where([class~='not-prose'] *)) {
         color: inherit !important;
         background-color: transparent !important;
+        display: block;
     }
 
     .prose :where(code, pre):not(:where([class~='not-prose'] *)) {
