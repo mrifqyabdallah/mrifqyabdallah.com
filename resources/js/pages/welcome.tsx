@@ -128,16 +128,16 @@ export default function Welcome({
                                         <ul className="mt-7 flex gap-3 text-sm leading-normal">
                                             <li>
                                                 <Button asChild size="icon-lg">
-                                                    <Link href="https://www.linkedin.com/in/mrifqyabdallah/">
+                                                    <a href="https://www.linkedin.com/in/mrifqyabdallah/" target="_blank">
                                                         <LinkedinIcon />
-                                                    </Link>
+                                                    </a>
                                                 </Button>
                                             </li>
                                             <li>
                                                 <Button asChild size="icon-lg">
-                                                    <Link href="https://github.com/mrifqyabdallah/">
+                                                    <a href="https://github.com/mrifqyabdallah/" target="_blank">
                                                         <GithubIcon />
-                                                    </Link>
+                                                    </a>
                                                 </Button>
                                             </li>
                                             <li>
@@ -179,16 +179,17 @@ export default function Welcome({
                                                                     asChild
                                                                     variant="link"
                                                                 >
-                                                                    <Link
+                                                                    <a
                                                                         href={
                                                                             website.url
                                                                         }
+                                                                        target="_blank"
                                                                     >
                                                                         {
                                                                             website.title
                                                                         }
                                                                         <ExternalLinkIcon />
-                                                                    </Link>
+                                                                    </a>
                                                                 </Button>
                                                             </span>
                                                         </li>

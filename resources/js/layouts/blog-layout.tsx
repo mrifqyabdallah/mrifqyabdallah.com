@@ -25,9 +25,10 @@ export default function BlogLayout({ children, style }: BlogLayoutProps) {
                 [data-blog-layout] {
                     --grid-color: rgba(0,0,0,0.06);
                     --bg: rgba(255,255,255,1);
-                    --fade-w: 50%;
-                    --fade-h: 60%;
-                    --fade-pos: 50% 20%;
+                    --fade-w: 100%;
+                    --fade-h: 90%;
+                    --fade-pos: 50% 50%;
+                    background-attachment: fixed;
                 }
                 .dark [data-blog-layout] {
                     --grid-color: rgba(255,255,255,0.12);

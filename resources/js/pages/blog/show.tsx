@@ -171,7 +171,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     return (
         <BlogLayout
             style={
-                { '--fade-w': '70%', '--fade-h': '70%' } as React.CSSProperties
+                { '--fade-pos': '35% 50%' } as React.CSSProperties
             }
         >
             <Head>
@@ -283,7 +283,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
 
                     {/* TOC sidebar */}
                     {tocItems.length > 0 && (
-                        <aside className="hidden w-56 shrink-0 xl:block">
+                        <aside className="hidden w-56 shrink-0 lg:block">
                             <div
                                 className="sticky top-16 rounded-lg p-4"
                                 style={{
