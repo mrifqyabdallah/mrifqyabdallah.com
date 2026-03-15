@@ -11,6 +11,11 @@ import {
 import React, { useEffect, useState, useMemo } from 'react';
 import type { Components } from 'react-markdown';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import {
+    oneLight,
+    oneDark,
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -169,11 +174,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     };
 
     return (
-        <BlogLayout
-            style={
-                { '--fade-pos': '35% 50%' } as React.CSSProperties
-            }
-        >
+        <BlogLayout style={{ '--fade-pos': '35% 50%' } as React.CSSProperties}>
             <Head>
                 <title>{blog.title}</title>
                 <meta name="description" content={blog.excerpt} />
@@ -307,6 +308,20 @@ interface MarkdownContentProps {
 }
 
 function MarkdownContent({ content }: MarkdownContentProps) {
+    const [isDark, setIsDark] = useState(() =>
+        document.documentElement.classList.contains('dark'),
+    );
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDark(document.documentElement.classList.contains('dark'));
+        });
+        observer.observe(document.documentElement, {
+            attributeFilter: ['class'],
+        });
+        return () => observer.disconnect();
+    }, []);
+
     const components = useMemo<Components>(() => {
         const makeHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
             return function Heading({
@@ -332,6 +347,37 @@ function MarkdownContent({ content }: MarkdownContentProps) {
             h4: makeHeading(4),
             h5: makeHeading(5),
             h6: makeHeading(6),
+            pre({ children }) {
+                const child = React.Children.toArray(children)[0];
+                if (React.isValidElement(child) && child.type === 'code') {
+                    const { className, children: code } = child.props as {
+                        className?: string;
+                        children: string;
+                    };
+                    const lang =
+                        /language-(\w+)/.exec(className ?? '')?.[1] ?? 'text';
+                    const codeString = String(code).trimEnd();
+
+                    return (
+                        <div className="group relative">
+                            <CopyButton code={codeString} />
+                            <SyntaxHighlighter
+                                language={lang}
+                                style={isDark ? oneDark : oneLight}
+                                customStyle={{
+                                    margin: 0,
+                                    borderRadius: 0,
+                                    border: '1px solid var(--border)',
+                                    fontSize: '0.875em',
+                                }}
+                            >
+                                {codeString}
+                            </SyntaxHighlighter>
+                        </div>
+                    );
+                }
+                return <pre>{children}</pre>;
+            },
             p({ children, ...props }) {
                 const text = String(children);
                 const match = text.match(/^::youtube\[([a-zA-Z0-9_-]+)\]$/);
@@ -351,7 +397,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                 return <p {...props}>{children}</p>;
             },
         };
-    }, []);
+    }, [isDark]);
 
     return (
         <div className="prose prose-base max-w-none prose-neutral dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-a:underline prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-border prose-pre:bg-muted prose-img:rounded-lg prose-img:border prose-img:border-border">
@@ -363,5 +409,33 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                 {content}
             </ReactMarkdown>
         </div>
+    );
+}
+
+function CopyButton({ code }: { code: string }) {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(code);
+        } catch {
+            const el = document.createElement('textarea');
+            el.value = code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <button
+            onClick={handleCopy}
+            className="absolute top-2 right-2 z-10 rounded border border-border bg-muted px-2 py-1 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+        >
+            {copied ? 'Copied!' : 'Copy'}
+        </button>
     );
 }
