@@ -241,4 +241,9 @@
     .prose :where(h1, h2, h3, h4, h5, h6) a:hover {
         text-decoration: underline !important;
     }
+
+    .prose :where(ul > li)::marker {
+        font-size: 1.2em;
+        color: var(--foreground) !important;
+    }
 }
