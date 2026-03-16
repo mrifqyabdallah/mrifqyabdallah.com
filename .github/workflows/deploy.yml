@@ -9,14 +9,14 @@ permissions:
   packages: write
 
 jobs:
-  phpstan:
+  run-phpstan:
     uses: ./.github/workflows/phpstan.yml
 
-  pest:
+  run-pest:
     uses: ./.github/workflows/pest.yml
 
   build:
-    needs: [phpstan, pest]
+    needs: [run-phpstan, run-pest]
     runs-on: ubuntu-24.04
     outputs:
       image: ${{ steps.meta.outputs.tags }}
