@@ -5,8 +5,8 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import BlogLayout from '@/layouts/blog-layout';
-import type { Blog, PaginatedBlogs } from '@/types/blog';
 import { index, show, feed } from '@/routes/blog';
+import type { Blog, PaginatedBlogs } from '@/types/blog';
 
 interface Props {
     blogs: PaginatedBlogs;

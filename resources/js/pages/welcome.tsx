@@ -3,9 +3,9 @@ import { ExternalLinkIcon, GithubIcon, LinkedinIcon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppearanceToggleTab from '@/components/appearance-tabs';
 import { Button } from '@/components/ui/button';
-import type { SharedData } from '@/types';
 import { dashboard, login, register } from '@/routes';
 import { index as blog } from '@/routes/blog';
+import type { SharedData } from '@/types';
 
 type Website = {
     title: string;
@@ -128,14 +128,20 @@ export default function Welcome({
                                         <ul className="mt-7 flex gap-3 text-sm leading-normal">
                                             <li>
                                                 <Button asChild size="icon-lg">
-                                                    <a href="https://www.linkedin.com/in/mrifqyabdallah/" target="_blank">
+                                                    <a
+                                                        href="https://www.linkedin.com/in/mrifqyabdallah/"
+                                                        target="_blank"
+                                                    >
                                                         <LinkedinIcon />
                                                     </a>
                                                 </Button>
                                             </li>
                                             <li>
                                                 <Button asChild size="icon-lg">
-                                                    <a href="https://github.com/mrifqyabdallah/" target="_blank">
+                                                    <a
+                                                        href="https://github.com/mrifqyabdallah/"
+                                                        target="_blank"
+                                                    >
                                                         <GithubIcon />
                                                     </a>
                                                 </Button>
