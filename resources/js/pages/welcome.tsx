@@ -3,9 +3,9 @@ import { ExternalLinkIcon, GithubIcon, LinkedinIcon } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppearanceToggleTab from '@/components/appearance-tabs';
 import { Button } from '@/components/ui/button';
+import type { SharedData } from '@/types';
 import { dashboard, login, register } from '@/routes';
 import { index as blog } from '@/routes/blog';
-import type { SharedData } from '@/types';
 
 type Website = {
     title: string;
