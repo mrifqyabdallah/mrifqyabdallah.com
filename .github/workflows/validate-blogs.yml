@@ -1,4 +1,4 @@
-name: Validate Blog Frontmatter
+name: validate blog frontmatter
 
 on:
   pull_request:
