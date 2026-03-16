@@ -22,8 +22,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import BlogLayout from '@/layouts/blog-layout';
-import type { Blog } from '@/types/blog';
 import { index, destroy } from '@/routes/blog';
+import type { Blog } from '@/types/blog';
 
 interface Props {
     blog: Blog;
