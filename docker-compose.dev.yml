@@ -8,7 +8,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: runtime
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     working_dir: /app
     volumes:
       - .:/app
