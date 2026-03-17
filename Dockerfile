@@ -28,6 +28,16 @@ RUN install-php-extensions \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # =============================================================================
+# Dev stage: runtime + a user that matches your machine's uid/gid (1000:1000)
+# =============================================================================
+FROM runtime AS dev
+ARG UID=1000
+ARG GID=1000
+RUN groupadd --gid ${GID} devuser \
+    && useradd --uid ${UID} --gid ${GID} --create-home --shell /bin/bash devuser
+USER devuser
+
+# =============================================================================
 # Build stage: install dependencies and compile assets for production
 # =============================================================================
 FROM runtime AS builder
