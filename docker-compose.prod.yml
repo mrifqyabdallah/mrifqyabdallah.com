@@ -25,6 +25,7 @@ services:
       CFCACHE_ZONE_ID: ${CFCACHE_ZONE_ID}
       ACME_EMAIL: ${ACME_EMAIL}
       PHP_INI_SCAN_DIR: /usr/local/etc/php/conf.d
+      LOG_STACK: ${LOG_STACK:-daily}
     depends_on:
       postgres:
         condition: service_healthy
