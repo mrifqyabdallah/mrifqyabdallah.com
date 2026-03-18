@@ -64,7 +64,7 @@ class BlogStats extends Command
             return self::SUCCESS;
         }
  
-        $this->components->info("Queueing stats for {$this->count($activeBlogIds)} active post(s) today...");
+        $this->components->info("Queueing stats for ". count($activeBlogIds) . " active post(s) today...");
         return $this->executeGenerate($activeBlogIds);
     }
 
