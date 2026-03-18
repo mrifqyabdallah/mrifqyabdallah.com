@@ -47,13 +47,13 @@ final class BlogViewStatsQuery
             ->toDateString();
 
         return BlogView::query()
-            ->selectRaw('date, COUNT(*) AS views')
+            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
             ->where('date', '>=', $cutoff)
-            ->groupBy('date')
-            ->orderBy('date')
+            ->groupBy('view_date')
+            ->orderBy('view_date')
             ->get()
             ->map(static fn (BlogView $row): BlogDailyView => new BlogDailyView(
-                date:  (string) $row->date,   // @phpstan-ignore-line cast.useless
+                date:  (string) $row->view_date,   // @phpstan-ignore-line cast.useless
                 views: (int) $row->views,     // @phpstan-ignore-line cast.useless
             ))
             ->values()
@@ -71,8 +71,8 @@ final class BlogViewStatsQuery
         return BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
             ->where('date', '>=', $cutoff)
-            ->groupByRaw("TO_CHAR(date, 'YYYY-MM')")
-            ->orderByRaw("TO_CHAR(date, 'YYYY-MM')")
+            ->groupByRaw("month")
+            ->orderByRaw("month")
             ->get()
             ->map(static fn (BlogView $row): BlogMonthlyView => new BlogMonthlyView(
                 month: (string) $row->month,  // @phpstan-ignore-line cast.useless
@@ -87,8 +87,8 @@ final class BlogViewStatsQuery
     {
         return BlogView::query()
             ->selectRaw("EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views")
-            ->groupByRaw('EXTRACT(YEAR FROM date)')
-            ->orderByRaw('EXTRACT(YEAR FROM date)')
+            ->groupByRaw('year')
+            ->orderByRaw('year')
             ->get()
             ->map(static fn (BlogView $row): BlogYearlyView => new BlogYearlyView(
                 year: (string) $row->year,    // @phpstan-ignore-line cast.useless

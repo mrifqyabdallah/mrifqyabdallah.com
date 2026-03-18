@@ -48,14 +48,14 @@ final class PostViewStatsQuery
             ->toDateString();
 
         return BlogView::query()
-            ->selectRaw('date, COUNT(*) AS views')
+            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
             ->where('blog_id', $this->blogId)
             ->where('date', '>=', $cutoff)
-            ->groupBy('date')
-            ->orderBy('date')
+            ->groupByRaw("view_date")
+            ->orderByRaw("view_date")
             ->get()
             ->map(static fn (BlogView $row): PostDailyView => new PostDailyView(
-                date: (string) $row->date,    // @phpstan-ignore-line cast.useless
+                date: (string) $row->view_date,    // @phpstan-ignore-line cast.useless
                 views: (int) $row->views,     // @phpstan-ignore-line cast.useless
             ))
             ->values()
@@ -74,8 +74,8 @@ final class PostViewStatsQuery
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
             ->where('blog_id', $this->blogId)
             ->where('date', '>=', $cutoff)
-            ->groupByRaw("TO_CHAR(date, 'YYYY-MM')")
-            ->orderByRaw("TO_CHAR(date, 'YYYY-MM')")
+            ->groupByRaw("month")
+            ->orderByRaw("month")
             ->get()
             ->map(static fn (BlogView $row): PostMonthlyView => new PostMonthlyView(
                 month: (string) $row->month,  // @phpstan-ignore-line cast.useless
@@ -91,8 +91,8 @@ final class PostViewStatsQuery
         return BlogView::query()
             ->selectRaw("EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views")
             ->where('blog_id', $this->blogId)
-            ->groupByRaw('EXTRACT(YEAR FROM date)')
-            ->orderByRaw('EXTRACT(YEAR FROM date)')
+            ->groupByRaw('year')
+            ->orderByRaw('year')
             ->get()
             ->map(static fn (BlogView $row): PostYearlyView => new PostYearlyView(
                 year: (string) $row->year,    // @phpstan-ignore-line cast.useless
