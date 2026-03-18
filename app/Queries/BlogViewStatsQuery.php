@@ -8,13 +8,9 @@ use App\Dto\BlogDailyView;
 use App\Dto\BlogMonthlyView;
 use App\Dto\BlogViewStats;
 use App\Dto\BlogYearlyView;
-use App\Dto\PostDailyView;
-use App\Dto\PostHistoryView;
 use App\Dto\PostTotalView;
-use App\Models\Blog;
 use App\Models\BlogView;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Collection;
 
 final class BlogViewStatsQuery
 {
@@ -34,7 +30,6 @@ final class BlogViewStatsQuery
             monthly: $this->monthly(),
             yearly: $this->yearly(),
             topPosts: $this->topPosts(),
-            postHistories: $this->postHistories(),
             generatedAt: $this->now,
         );
     }
@@ -120,46 +115,6 @@ final class BlogViewStatsQuery
                 blogSlug: $row->blog->slug,
                 views: (int) $row->views, // @phpstan-ignore-line cast.useless
             ))
-            ->values()
-            ->all();
-    }
-
-    /** @return list<PostHistoryView> */
-    public function postHistories(): array
-    {
-        $cutoff = $this->now->copy()
-            ->subDays(self::DAILY_WINDOW_DAYS - 1)
-            ->toDateString();
-
-        /** @var Collection<int, Collection<int, BlogView>> $byBlog */
-        $byBlog = BlogView::query()
-            ->selectRaw('blog_id, date, COUNT(*) AS views')
-            ->where('date', '>=', $cutoff)
-            ->groupBy('blog_id', 'date')
-            ->orderBy('date')
-            ->get()
-            ->groupBy('blog_id');
-
-        return Blog::query()
-            ->select(['id', 'title', 'slug'])
-            ->get()
-            ->map(static function (Blog $blog) use ($byBlog): PostHistoryView {
-                /** @var Collection<int, BlogView> $rows */
-                $rows = $byBlog->get($blog->id, collect());
-
-                return new PostHistoryView(
-                    blogId: $blog->id,
-                    blogTitle: $blog->title,
-                    blogSlug: $blog->slug,
-                    daily: $rows
-                        ->map(static fn (BlogView $row): PostDailyView => new PostDailyView(
-                            date: (string) $row->date,    // @phpstan-ignore-line cast.useless
-                            views: (int) $row->views,     // @phpstan-ignore-line cast.useless
-                        ))
-                        ->values()
-                        ->all(),
-                );
-            })
             ->values()
             ->all();
     }

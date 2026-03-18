@@ -11,7 +11,6 @@ final readonly class BlogViewStats
      * @param list<BlogMonthlyView> $monthly
      * @param list<BlogYearlyView> $yearly
      * @param list<PostTotalView> $topPosts
-     * @param list<PostHistoryView> $postHistories
      */
     public function __construct(
         public int $totalViews,
@@ -19,21 +18,9 @@ final readonly class BlogViewStats
         public array $monthly,
         public array $yearly,
         public array $topPosts,
-        public array $postHistories,
         public CarbonImmutable $generatedAt,
     ) {}
 
-    /**
-     * @return array{
-     *     total_views: int,
-     *     daily: list<array{date: string, views: int}>,
-     *     monthly: list<array{month: string, views: int}>,
-     *     yearly: list<array{year: string, views: int}>,
-     *     top_posts: list<array{blog_id: int, blog_title: string, blog_slug: string, views: int}>,
-     *     post_histories: list<array{blog_id: int, blog_title: string, blog_slug: string, daily: list<array{date: string, views: int}>}>,
-     *     generated_at: string
-     * }
-     */
     public function toArray(): array
     {
         return [
@@ -53,10 +40,6 @@ final readonly class BlogViewStats
             'top_posts' => array_map(
                 static fn (PostTotalView $t) => $t->toArray(),
                 $this->topPosts,
-            ),
-            'post_histories' => array_map(
-                static fn (PostHistoryView $p) => $p->toArray(),
-                $this->postHistories,
             ),
             'generated_at' => $this->generatedAt->toISOString(),
         ];
