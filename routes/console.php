@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Uncomment the line below to check if scheduler is alive in storage/logs/
+// Schedule::call(fn () => logger('scheduler is alive'))->everyFiveSeconds();
+
+Schedule::command('blog:stats')->dailyAt('02:30');
