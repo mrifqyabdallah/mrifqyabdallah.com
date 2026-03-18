@@ -1,11 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Tag, X, Rss } from 'lucide-react';
+import { Search, Tag, X, Rss, ChartNoAxesCombined } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import BlogLayout from '@/layouts/blog-layout';
 import { index, show, feed } from '@/routes/blog';
+import { blog as stats } from '@/routes/stats';
 import type { Blog, PaginatedBlogs } from '@/types/blog';
 
 interface Props {
@@ -133,9 +134,16 @@ export default function BlogIndex({
                         <h1 className="text-4xl font-bold tracking-tight">
                             Community Blog
                         </h1>
+                        <Link
+                            href={stats().url}
+                            className=" ml-auto text-muted-foreground transition-colors hover:text-foreground"
+                            title="Statistics"
+                        >
+                            <ChartNoAxesCombined className="h-5 w-5" />
+                        </Link>
                         <a
                             href={feed().url}
-                            className="ml-auto text-muted-foreground transition-colors hover:text-foreground"
+                            className="text-muted-foreground transition-colors hover:text-foreground"
                             title="RSS Feed"
                         >
                             <Rss className="h-5 w-5" />

@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import BlogLayout from '@/layouts/blog-layout';
 import { index, destroy } from '@/routes/blog';
+import { post as stats } from '@/routes/stats';
 import type { Blog } from '@/types/blog';
 
 interface Props {
@@ -235,11 +236,13 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                                         {publishedDate}
                                     </time>
                                 </span>
-                                <span className="inline-flex items-center gap-1.5">
-                                    <Eye className="h-3.5 w-3.5" />
-                                    {viewCount.toLocaleString()}{' '}
-                                    {viewCount > 1 ? 'views' : 'view'}
-                                </span>
+                                <Link href={stats(blog.slug).url}>
+                                    <span className="inline-flex items-center gap-1.5 underline decoration-wavy decoration-2">
+                                        <Eye className="h-3.5 w-3.5" />
+                                        {viewCount.toLocaleString()}{' '}
+                                        {viewCount > 1 ? 'views' : 'view'}
+                                    </span>
+                                </Link>
 
                                 {isAdmin && !isArchived && (
                                     <Button
