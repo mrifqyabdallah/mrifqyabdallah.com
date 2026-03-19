@@ -17,13 +17,15 @@ final class PostViewStatsQuery
     private const MONTHLY_WINDOW_MONTHS = 12;
 
     public function __construct(
-        private readonly int $blogId,
+        private readonly Blog|int $blogId,
         private readonly CarbonImmutable $now,
     ) {}
 
     public function get(): PostViewStats
     {
-        $blog = Blog::select(['id', 'title', 'slug'])->find($this->blogId);
+        $blog = $this->blogId instanceof Blog ? $this->blogId :
+            Blog::select(['id', 'title', 'slug'])->findOrFail($this->blogId);
+
         $yearly = $this->yearly();
 
         return new PostViewStats(
@@ -44,62 +46,69 @@ final class PostViewStatsQuery
     /** @return list<PostDailyView> */
     public function daily(): array
     {
+        $blog_id = $this->blogId instanceof Blog ? $this->blogId->id : $this->blogId;
         $cutoff = $this->now->copy()
             ->subDays(self::DAILY_WINDOW_DAYS - 1)
             ->toDateString();
 
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
-            ->where('blog_id', $this->blogId)
+            ->where('blog_id', $blog_id)
             ->where('date', '>=', $cutoff)
             ->groupByRaw('view_date')
             ->orderByRaw('view_date')
             ->get()
             ->map(static fn (BlogView $row): PostDailyView => new PostDailyView(
-                date: (string) $row->view_date,    // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                date: (string) $row->view_date, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 
     /** @return list<PostMonthlyView> */
     public function monthly(): array
     {
+        $blog_id = $this->blogId instanceof Blog ? $this->blogId->id : $this->blogId;
         $cutoff = $this->now->copy()
             ->subMonths(self::MONTHLY_WINDOW_MONTHS - 1)
             ->startOfMonth()
             ->toDateString();
 
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
-            ->where('blog_id', $this->blogId)
+            ->where('blog_id', $blog_id)
             ->where('date', '>=', $cutoff)
             ->groupByRaw('month')
             ->orderByRaw('month')
             ->get()
             ->map(static fn (BlogView $row): PostMonthlyView => new PostMonthlyView(
-                month: (string) $row->month,  // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                month: (string) $row->month, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 
     /** @return list<PostYearlyView> */
     public function yearly(): array
     {
-        return BlogView::query()
+        $blog_id = $this->blogId instanceof Blog ? $this->blogId->id : $this->blogId;
+
+        $data = BlogView::query()
             ->selectRaw('EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views')
-            ->where('blog_id', $this->blogId)
+            ->where('blog_id', $blog_id)
             ->groupByRaw('year')
             ->orderByRaw('year')
             ->get()
             ->map(static fn (BlogView $row): PostYearlyView => new PostYearlyView(
-                year: (string) $row->year,    // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                year: (string) $row->year, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 }

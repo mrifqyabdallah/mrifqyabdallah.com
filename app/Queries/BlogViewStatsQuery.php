@@ -7,6 +7,7 @@ use App\Dto\BlogMonthlyView;
 use App\Dto\BlogViewStats;
 use App\Dto\BlogYearlyView;
 use App\Dto\PostTotalView;
+use App\Models\Blog;
 use App\Models\BlogView;
 use Carbon\CarbonImmutable;
 
@@ -46,18 +47,19 @@ final class BlogViewStatsQuery
             ->subDays(self::DAILY_WINDOW_DAYS - 1)
             ->toDateString();
 
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
             ->where('date', '>=', $cutoff)
             ->groupBy('view_date')
             ->orderBy('view_date')
             ->get()
             ->map(static fn (BlogView $row): BlogDailyView => new BlogDailyView(
-                date: (string) $row->view_date,   // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                date: (string) $row->view_date, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 
     /** @return list<BlogMonthlyView> */
@@ -68,40 +70,42 @@ final class BlogViewStatsQuery
             ->startOfMonth()
             ->toDateString();
 
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
             ->where('date', '>=', $cutoff)
             ->groupByRaw('month')
             ->orderByRaw('month')
             ->get()
             ->map(static fn (BlogView $row): BlogMonthlyView => new BlogMonthlyView(
-                month: (string) $row->month,  // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                month: (string) $row->month,  // @phpstan-ignore-line
+                views: (int) $row->views,     // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 
     /** @return list<BlogYearlyView> */
     public function yearly(): array
     {
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw('EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views')
             ->groupByRaw('year')
             ->orderByRaw('year')
             ->get()
             ->map(static fn (BlogView $row): BlogYearlyView => new BlogYearlyView(
-                year: (string) $row->year,    // @phpstan-ignore-line cast.useless
-                views: (int) $row->views,     // @phpstan-ignore-line cast.useless
+                year: (string) $row->year,    // @phpstan-ignore-line
+                views: (int) $row->views,     // @phpstan-ignore-line
             ))
-            ->values()
             ->all();
+
+        return array_values($data);
     }
 
     /** @return list<PostTotalView> */
     public function topPosts(): array
     {
-        return BlogView::query()
+        $data = BlogView::query()
             ->selectRaw('blog_id, COUNT(*) AS views')
             ->groupBy('blog_id')
             ->orderByRaw('COUNT(*) DESC')
@@ -109,13 +113,18 @@ final class BlogViewStatsQuery
             ->with('blog:id,title,slug')
             ->get()
             ->filter(static fn (BlogView $row): bool => $row->blog !== null)
-            ->map(static fn (BlogView $row): PostTotalView => new PostTotalView(
-                blogId: $row->blog->id,
-                blogTitle: $row->blog->title,
-                blogSlug: $row->blog->slug,
-                views: (int) $row->views, // @phpstan-ignore-line cast.useless
-            ))
-            ->values()
+            ->map(static function (BlogView $row): PostTotalView {
+                assert($row->blog instanceof Blog);
+
+                return new PostTotalView(
+                    blogId: $row->blog->id,
+                    blogTitle: $row->blog->title,
+                    blogSlug: $row->blog->slug,
+                    views: (int) $row->views, // @phpstan-ignore-line
+                );
+            })
             ->all();
+
+        return array_values($data);
     }
 }
