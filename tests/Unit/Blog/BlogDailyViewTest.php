@@ -6,7 +6,7 @@ it('returns correct array shape', function (): void {
     $dto = new BlogDailyView(date: '2024-06-01', views: 5);
 
     expect($dto->toArray())->toBe([
-        'date'  => '2024-06-01',
+        'date' => '2024-06-01',
         'views' => 5,
     ]);
 });

@@ -10,7 +10,7 @@ beforeEach(function (): void {
     Queue::fake();
 });
 
-describe('blog:stats', function() {
+describe('blog:stats', function () {
     it('dispatches post job for each active blog today', function (): void {
         $a = Blog::factory()->create();
         $b = Blog::factory()->create();
@@ -53,7 +53,7 @@ describe('blog:stats', function() {
     });
 });
 
-describe('blog:stats --all', function() {
+describe('blog:stats --all', function () {
     it('dispatches post job for every blog with --all flag', function (): void {
         $a = Blog::factory()->create();
         $b = Blog::factory()->create();
@@ -83,7 +83,7 @@ describe('blog:stats --all', function() {
     });
 
     it('includes blogs with no views with --all flag', function (): void {
-        $withViews    = Blog::factory()->create();
+        $withViews = Blog::factory()->create();
         $withoutViews = Blog::factory()->create();
 
         BlogView::factory()->for($withViews)->create();

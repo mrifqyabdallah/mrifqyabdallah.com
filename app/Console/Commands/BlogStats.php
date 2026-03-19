@@ -32,7 +32,7 @@ class BlogStats extends Command
         if ((bool) $this->option('all')) {
             return $this->generateAll();
         }
- 
+
         return $this->generateToday();
     }
 
@@ -40,16 +40,18 @@ class BlogStats extends Command
     {
         /** @var list<int> $blogIds */
         $blogIds = Blog::query()->pluck('id')->all();
- 
+
         if (empty($blogIds)) {
             $this->components->warn('No blog posts found.');
+
             return self::SUCCESS;
         }
- 
-        $this->components->info("Queueing stats for " . count($blogIds) . " post(s)...");
+
+        $this->components->info('Queueing stats for '.count($blogIds).' post(s)...');
+
         return $this->executeGenerate($blogIds);
     }
- 
+
     private function generateToday(): int
     {
         /** @var list<int> $activeBlogIds */
@@ -58,35 +60,37 @@ class BlogStats extends Command
             ->distinct()
             ->pluck('blog_id')
             ->all();
- 
+
         if (empty($activeBlogIds)) {
             $this->components->warn('No posts had views today. Nothing queued.');
+
             return self::SUCCESS;
         }
- 
-        $this->components->info("Queueing stats for ". count($activeBlogIds) . " active post(s) today...");
+
+        $this->components->info('Queueing stats for '.count($activeBlogIds).' active post(s) today...');
+
         return $this->executeGenerate($activeBlogIds);
     }
 
     /**
-     * @param list<int> $blogIds
+     * @param  list<int>  $blogIds
      */
     private function executeGenerate(array $blogIds): int
-    { 
+    {
         $bar = $this->output->createProgressBar(count($blogIds));
         $bar->start();
- 
+
         foreach ($blogIds as $blogId) {
             GeneratePostStats::dispatch($blogId);
             $bar->advance();
         }
- 
+
         $bar->finish();
         $this->newLine(2);
- 
+
         GenerateBlogStats::dispatch();
         $this->components->info('Job "blog overview stats" queued.');
- 
+
         return self::SUCCESS;
     }
 }

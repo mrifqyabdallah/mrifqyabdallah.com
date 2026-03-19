@@ -18,7 +18,7 @@ function blogQuery(CarbonImmutable $now): BlogViewStatsQuery
     return new BlogViewStatsQuery(now: $now);
 }
 
-describe('get()', function() {
+describe('get()', function () {
     it('returns correct structure', function (): void {
         expect(blogQuery($this->now)->get())
             ->toHaveKey('total_views')
@@ -34,7 +34,7 @@ describe('get()', function() {
     });
 });
 
-describe('totalViews()', function() {
+describe('totalViews()', function () {
     it('counts all rows for total views', function (): void {
         BlogView::factory()->count(7)->create();
 
@@ -46,7 +46,7 @@ describe('totalViews()', function() {
     });
 });
 
-describe('daily()', function() {
+describe('daily()', function () {
     it('aggregates daily views across all blogs', function (): void {
         $a = Blog::factory()->create();
         $b = Blog::factory()->create();
@@ -79,7 +79,7 @@ describe('daily()', function() {
     });
 });
 
-describe('monthly()', function() {
+describe('monthly()', function () {
     it('aggregates monthly views across all blogs', function (): void {
         $a = Blog::factory()->create();
         $b = Blog::factory()->create();
@@ -101,7 +101,7 @@ describe('monthly()', function() {
     });
 });
 
-describe('yearly()', function() {
+describe('yearly()', function () {
     it('aggregates yearly views across all blogs', function (): void {
         $a = Blog::factory()->create();
         $b = Blog::factory()->create();
@@ -124,10 +124,10 @@ describe('yearly()', function() {
     });
 });
 
-describe('topPosts()', function() {
+describe('topPosts()', function () {
     it('orders top posts by views descending', function (): void {
         $popular = Blog::factory()->create();
-        $quiet   = Blog::factory()->create();
+        $quiet = Blog::factory()->create();
 
         BlogView::factory()->for($popular)->count(10)->create();
         BlogView::factory()->for($quiet)->count(2)->create();

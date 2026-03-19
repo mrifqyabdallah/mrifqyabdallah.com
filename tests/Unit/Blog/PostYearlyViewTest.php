@@ -8,7 +8,7 @@ it('returns correct array shape', function (): void {
     $dto = new PostYearlyView(year: '2024', views: 310);
 
     expect($dto->toArray())->toBe([
-        'year'  => '2024',
+        'year' => '2024',
         'views' => 310,
     ]);
 });

@@ -8,19 +8,19 @@ use App\Dto\PostTotalView;
 use Carbon\CarbonImmutable;
 
 function makeBlogViewStats(
-    int     $totalViews  = 0,
-    array   $daily       = [],
-    array   $monthly     = [],
-    array   $yearly      = [],
-    array   $topPosts    = [],
+    int $totalViews = 0,
+    array $daily = [],
+    array $monthly = [],
+    array $yearly = [],
+    array $topPosts = [],
     ?CarbonImmutable $generatedAt = null,
 ): BlogViewStats {
     return new BlogViewStats(
-        totalViews:  $totalViews,
-        daily:       $daily,
-        monthly:     $monthly,
-        yearly:      $yearly,
-        topPosts:    $topPosts,
+        totalViews: $totalViews,
+        daily: $daily,
+        monthly: $monthly,
+        yearly: $yearly,
+        topPosts: $topPosts,
         generatedAt: $generatedAt ?? now(),
     );
 }
@@ -71,19 +71,19 @@ it('serializes yearly entries', function (): void {
 it('serializes top posts', function (): void {
     $array = makeBlogViewStats(
         topPosts: [new PostTotalView(
-            blogId:    1,
+            blogId: 1,
             blogTitle: 'Popular',
-            blogSlug:  'popular',
-            views:     50,
+            blogSlug: 'popular',
+            views: 50,
         )],
     )->toArray();
 
     expect($array['top_posts'])->toHaveCount(1)
         ->and($array['top_posts'][0])->toBe([
-            'blog_id'    => 1,
+            'blog_id' => 1,
             'blog_title' => 'Popular',
-            'blog_slug'  => 'popular',
-            'views'      => 50,
+            'blog_slug' => 'popular',
+            'views' => 50,
         ]);
 });
 

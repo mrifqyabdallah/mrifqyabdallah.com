@@ -9,23 +9,23 @@ use App\Dto\PostYearlyView;
 use Carbon\CarbonImmutable;
 
 function makePostViewStats(
-    int     $blogId     = 1,
-    string  $blogTitle  = 'Test Post',
-    string  $blogSlug   = 'test-post',
-    int     $totalViews = 0,
-    array   $daily      = [],
-    array   $monthly    = [],
-    array   $yearly     = [],
+    int $blogId = 1,
+    string $blogTitle = 'Test Post',
+    string $blogSlug = 'test-post',
+    int $totalViews = 0,
+    array $daily = [],
+    array $monthly = [],
+    array $yearly = [],
     ?CarbonImmutable $generatedAt = null,
 ): PostViewStats {
     return new PostViewStats(
-        blogId:      $blogId,
-        blogTitle:   $blogTitle,
-        blogSlug:    $blogSlug,
-        totalViews:  $totalViews,
-        daily:       $daily,
-        monthly:     $monthly,
-        yearly:      $yearly,
+        blogId: $blogId,
+        blogTitle: $blogTitle,
+        blogSlug: $blogSlug,
+        totalViews: $totalViews,
+        daily: $daily,
+        monthly: $monthly,
+        yearly: $yearly,
         generatedAt: $generatedAt ?? now(),
     );
 }
@@ -46,9 +46,9 @@ it('contains all required keys', function (): void {
 
 it('maps scalar fields correctly', function (): void {
     $array = makePostViewStats(
-        blogId:     5,
-        blogTitle:  'My Post',
-        blogSlug:   'my-post',
+        blogId: 5,
+        blogTitle: 'My Post',
+        blogSlug: 'my-post',
         totalViews: 42,
     )->toArray();
 

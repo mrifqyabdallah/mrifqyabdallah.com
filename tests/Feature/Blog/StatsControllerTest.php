@@ -4,7 +4,7 @@ use App\Models\Blog;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 
-describe('GET /blog/stats', function() {
+describe('GET /blog/stats', function () {
     it('renders blog/stats page', function (): void {
         Storage::fake('public');
 
@@ -55,7 +55,7 @@ describe('GET /blog/stats', function() {
     });
 });
 
-describe('GET /blog/{slug}/stats', function() {
+describe('GET /blog/{slug}/stats', function () {
     it('renders /blog/{slug}/stats page', function (): void {
         Storage::fake('public');
         $blog = Blog::factory()->create();
@@ -75,9 +75,9 @@ describe('GET /blog/{slug}/stats', function() {
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('stats/post')
-                ->where('blog.id',    $blog->id)
+                ->where('blog.id', $blog->id)
                 ->where('blog.title', 'Hello World')
-                ->where('blog.slug',  'hello-world')
+                ->where('blog.slug', 'hello-world')
             );
     });
 

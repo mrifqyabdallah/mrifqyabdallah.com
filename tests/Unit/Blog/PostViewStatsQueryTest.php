@@ -10,7 +10,7 @@ use Carbon\CarbonImmutable;
 
 beforeEach(function (): void {
     $this->blog = Blog::factory()->create();
-    $this->now  = CarbonImmutable::parse('2024-06-15 12:00:00');
+    $this->now = CarbonImmutable::parse('2024-06-15 12:00:00');
 });
 
 function postQuery(Blog $blog, CarbonImmutable $now): PostViewStatsQuery
@@ -18,7 +18,7 @@ function postQuery(Blog $blog, CarbonImmutable $now): PostViewStatsQuery
     return new PostViewStatsQuery(blogId: $blog->id, now: $now);
 }
 
-describe('get()', function() {
+describe('get()', function () {
     it('returns correct structure', function (): void {
         expect(postQuery($this->blog, $this->now)->get())
             ->toHaveKey('blog_id')
@@ -60,7 +60,7 @@ describe('get()', function() {
     });
 });
 
-describe('daily()', function() {
+describe('daily()', function () {
     it('returns views within last 30 days', function (): void {
         BlogView::factory()->for($this->blog)->create(['date' => '2024-05-17']); // 30 days before is included
         BlogView::factory()->for($this->blog)->create(['date' => '2024-06-15']); // today
@@ -115,7 +115,7 @@ describe('daily()', function() {
     });
 });
 
-describe('monthly()', function() {
+describe('monthly()', function () {
     it('returns views within the last 12 months', function (): void {
         BlogView::factory()->for($this->blog)->create(['date' => '2023-07-01']); // 12 months before is included
         BlogView::factory()->for($this->blog)->create(['date' => '2024-06-15']); // this month
@@ -146,7 +146,7 @@ describe('monthly()', function() {
     });
 });
 
-describe('yearly()', function() {
+describe('yearly()', function () {
     it('covers all time for yearly stats', function (): void {
         BlogView::factory()->for($this->blog)->create(['date' => '2020-01-01']);
         BlogView::factory()->for($this->blog)->create(['date' => '2022-06-01']);

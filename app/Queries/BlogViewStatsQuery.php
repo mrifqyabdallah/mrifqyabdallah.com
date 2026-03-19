@@ -13,7 +13,9 @@ use Carbon\CarbonImmutable;
 final class BlogViewStatsQuery
 {
     private const DAILY_WINDOW_DAYS = 30;
+
     private const MONTHLY_WINDOW_MONTHS = 12;
+
     private const TOP_POSTS_LIMIT = 10;
 
     public function __construct(
@@ -51,7 +53,7 @@ final class BlogViewStatsQuery
             ->orderBy('view_date')
             ->get()
             ->map(static fn (BlogView $row): BlogDailyView => new BlogDailyView(
-                date:  (string) $row->view_date,   // @phpstan-ignore-line cast.useless
+                date: (string) $row->view_date,   // @phpstan-ignore-line cast.useless
                 views: (int) $row->views,     // @phpstan-ignore-line cast.useless
             ))
             ->values()
@@ -69,8 +71,8 @@ final class BlogViewStatsQuery
         return BlogView::query()
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
             ->where('date', '>=', $cutoff)
-            ->groupByRaw("month")
-            ->orderByRaw("month")
+            ->groupByRaw('month')
+            ->orderByRaw('month')
             ->get()
             ->map(static fn (BlogView $row): BlogMonthlyView => new BlogMonthlyView(
                 month: (string) $row->month,  // @phpstan-ignore-line cast.useless
@@ -84,7 +86,7 @@ final class BlogViewStatsQuery
     public function yearly(): array
     {
         return BlogView::query()
-            ->selectRaw("EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views")
+            ->selectRaw('EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views')
             ->groupByRaw('year')
             ->orderByRaw('year')
             ->get()
