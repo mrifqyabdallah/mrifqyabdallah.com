@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Jobs;
 
 use App\Models\Blog;
@@ -37,12 +35,7 @@ final class GeneratePostStats implements ShouldQueue
             return;
         }
 
-        $stats = (new PostViewStatsQuery(blogId: $this->blogId, now: now()))
-            ->get(
-                blogId: $blog->id,
-                blogTitle: $blog->title,
-                blogSlug: $blog->slug,
-            );
+        $stats = (new PostViewStatsQuery(blogId: $this->blogId, now: now()))->get();
 
         Storage::disk('public')->put(
             "stats/blogpost/{$this->blogId}.json",

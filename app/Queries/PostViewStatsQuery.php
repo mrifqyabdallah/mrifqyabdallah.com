@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Queries;
 
 use App\Dto\PostDailyView;
 use App\Dto\PostMonthlyView;
 use App\Dto\PostViewStats;
 use App\Dto\PostYearlyView;
+use App\Models\Blog;
 use App\Models\BlogView;
 use Carbon\CarbonImmutable;
 
@@ -21,14 +20,15 @@ final class PostViewStatsQuery
         private readonly CarbonImmutable $now,
     ) {}
 
-    public function get(int $blogId, string $blogTitle, string $blogSlug): PostViewStats
+    public function get(): PostViewStats
     {
+        $blog = Blog::select(['id', 'title', 'slug'])->find($this->blogId);
         $yearly = $this->yearly();
 
         return new PostViewStats(
-            blogId: $blogId,
-            blogTitle: $blogTitle,
-            blogSlug: $blogSlug,
+            blogId: $blog->id,
+            blogTitle: $blog->title,
+            blogSlug: $blog->slug,
             totalViews: array_sum(array_map(
                 static fn (PostYearlyView $y) => $y->views,
                 $yearly,
