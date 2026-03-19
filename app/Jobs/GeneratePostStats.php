@@ -29,13 +29,13 @@ final class GeneratePostStats implements ShouldQueue
      */
     public function handle(): void
     {
-        $blog = Blog::find($this->blogId);
+        $blog = Blog::select(['id', 'title', 'slug'])->find($this->blogId);
 
         if (! $blog) {
             return;
         }
 
-        $stats = (new PostViewStatsQuery(blogId: $this->blogId, now: now()))->get();
+        $stats = (new PostViewStatsQuery(blogId: $blog, now: now()))->get();
 
         Storage::disk('public')->put(
             "stats/blogpost/{$this->blogId}.json",
