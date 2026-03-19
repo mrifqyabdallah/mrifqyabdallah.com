@@ -17,7 +17,7 @@ class BlogViewFactory extends Factory
             'date' => today()->toDateString(),
         ];
     }
- 
+
     public function forGuest(): static
     {
         return $this->state([
@@ -25,7 +25,7 @@ class BlogViewFactory extends Factory
             'visitor_hash' => fake()->sha1(),
         ]);
     }
- 
+
     public function forUser(User $user): static
     {
         return $this->state([

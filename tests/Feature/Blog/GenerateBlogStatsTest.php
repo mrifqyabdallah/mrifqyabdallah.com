@@ -11,7 +11,7 @@ beforeEach(function (): void {
 
 function runBlogStatsJob(): void
 {
-    (new GenerateBlogStats())->handle();
+    (new GenerateBlogStats)->handle();
 }
 
 function readOverviewJson(): array

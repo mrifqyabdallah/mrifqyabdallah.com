@@ -136,7 +136,7 @@ export default function BlogIndex({
                         </h1>
                         <Link
                             href={stats().url}
-                            className=" ml-auto text-muted-foreground transition-colors hover:text-foreground"
+                            className="ml-auto text-muted-foreground transition-colors hover:text-foreground"
                             title="Statistics"
                         >
                             <ChartNoAxesCombined className="h-5 w-5" />

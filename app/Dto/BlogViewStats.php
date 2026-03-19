@@ -7,10 +7,10 @@ use Carbon\CarbonImmutable;
 final readonly class BlogViewStats
 {
     /**
-     * @param list<BlogDailyView> $daily
-     * @param list<BlogMonthlyView> $monthly
-     * @param list<BlogYearlyView> $yearly
-     * @param list<PostTotalView> $topPosts
+     * @param  list<BlogDailyView>  $daily
+     * @param  list<BlogMonthlyView>  $monthly
+     * @param  list<BlogYearlyView>  $yearly
+     * @param  list<PostTotalView>  $topPosts
      */
     public function __construct(
         public int $totalViews,

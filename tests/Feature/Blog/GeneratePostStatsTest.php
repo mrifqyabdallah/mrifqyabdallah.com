@@ -44,10 +44,10 @@ test('generated json file contains correct structure', function (): void {
         ->and($data['blog_slug'])->toBe('my-post')
         ->and($data['total_views'])->toBe(2)
         ->and($data)
-            ->toHaveKey('daily')
-            ->toHaveKey('monthly')
-            ->toHaveKey('yearly')
-            ->toHaveKey('generated_at');
+        ->toHaveKey('daily')
+        ->toHaveKey('monthly')
+        ->toHaveKey('yearly')
+        ->toHaveKey('generated_at');
 });
 
 test('total_views is sum across all years', function (): void {

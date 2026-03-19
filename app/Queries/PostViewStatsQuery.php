@@ -12,7 +12,8 @@ use Carbon\CarbonImmutable;
 
 final class PostViewStatsQuery
 {
-    private const DAILY_WINDOW_DAYS     = 30;
+    private const DAILY_WINDOW_DAYS = 30;
+
     private const MONTHLY_WINDOW_MONTHS = 12;
 
     public function __construct(
@@ -51,8 +52,8 @@ final class PostViewStatsQuery
             ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
             ->where('blog_id', $this->blogId)
             ->where('date', '>=', $cutoff)
-            ->groupByRaw("view_date")
-            ->orderByRaw("view_date")
+            ->groupByRaw('view_date')
+            ->orderByRaw('view_date')
             ->get()
             ->map(static fn (BlogView $row): PostDailyView => new PostDailyView(
                 date: (string) $row->view_date,    // @phpstan-ignore-line cast.useless
@@ -74,8 +75,8 @@ final class PostViewStatsQuery
             ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
             ->where('blog_id', $this->blogId)
             ->where('date', '>=', $cutoff)
-            ->groupByRaw("month")
-            ->orderByRaw("month")
+            ->groupByRaw('month')
+            ->orderByRaw('month')
             ->get()
             ->map(static fn (BlogView $row): PostMonthlyView => new PostMonthlyView(
                 month: (string) $row->month,  // @phpstan-ignore-line cast.useless
@@ -89,7 +90,7 @@ final class PostViewStatsQuery
     public function yearly(): array
     {
         return BlogView::query()
-            ->selectRaw("EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views")
+            ->selectRaw('EXTRACT(YEAR FROM date)::int AS year, COUNT(*) AS views')
             ->where('blog_id', $this->blogId)
             ->groupByRaw('year')
             ->orderByRaw('year')

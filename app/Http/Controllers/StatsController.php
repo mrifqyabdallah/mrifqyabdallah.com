@@ -20,12 +20,12 @@ final class StatsController extends Controller
 
     public function post(string $slug): Response
     {
-        $blog = Blog::where('slug', $slug)->firstOr(function() {
-            throw new BlogNotFoundException();
+        $blog = Blog::where('slug', $slug)->firstOr(function () {
+            throw new BlogNotFoundException;
         });
 
         return Inertia::render('stats/post', [
-            'blog'  => $blog->only('id', 'title', 'slug'),
+            'blog' => $blog->only('id', 'title', 'slug'),
             'stats' => $this->readJson("stats/blogpost/{$blog->id}.json"),
         ]);
     }
