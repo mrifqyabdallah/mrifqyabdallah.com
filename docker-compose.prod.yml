@@ -32,6 +32,8 @@ services:
     volumes:
       - caddy_data:/data
       - ./docker/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+      - storage_app:/app/storage/app
+      - storage_logs:/app/storage/logs
     entrypoint: ["/entrypoint.sh"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/up || exit 1"]
@@ -91,3 +93,5 @@ networks:
 volumes:
   postgres_data:
   caddy_data:
+  storage_app:
+  storage_logs:
