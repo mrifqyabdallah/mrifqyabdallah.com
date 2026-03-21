@@ -91,7 +91,7 @@ COPY docker/frankenphp/entrypoint.prod.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Copy OPcache configuration
-COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/php.ini docker/php/opcache.ini /usr/local/etc/php/conf.d/
 
 # Use non-root user for security
 USER www-data
