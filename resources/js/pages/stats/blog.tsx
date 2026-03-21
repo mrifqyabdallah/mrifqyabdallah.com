@@ -244,6 +244,7 @@ export default function BlogStatsPage({ stats }: Props) {
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
+              timeZoneName: 'short',
           })
         : null;
 
@@ -382,7 +383,7 @@ export default function BlogStatsPage({ stats }: Props) {
                                                         }
                                                         className="flex items-center gap-4 px-6 py-3.5 transition-colors hover:bg-muted/50"
                                                     >
-                                                        <span className="w-5 font-mono text-sm text-muted-foreground">
+                                                        <span className="w-5 text-sm text-muted-foreground">
                                                             {i + 1}
                                                         </span>
                                                         <span className="flex-1 truncate text-sm font-medium">

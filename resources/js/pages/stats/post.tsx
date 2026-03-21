@@ -249,6 +249,7 @@ export default function PostStatsPage({ blog, stats }: Props) {
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
+              timeZoneName: 'short',
           })
         : null;
 
