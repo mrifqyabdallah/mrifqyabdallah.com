@@ -67,6 +67,7 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
         with:
+          build-args: CACHE_BUST=${{ github.run_id }}
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}

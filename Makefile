@@ -112,6 +112,11 @@ composer:
 npm:
 	docker compose exec app npm $(filter-out $@, $(MAKECMDGOALS))
 
+# Run supervisorctl commands
+# Usage: make supervisorctl status
+sctl:
+	docker compose exec app supervisorctl -c /etc/supervisor/conf.d/supervisord.conf $(filter-out $@, $(MAKECMDGOALS))
+
 # =============================================================================
 # PostgreSQL
 # =============================================================================

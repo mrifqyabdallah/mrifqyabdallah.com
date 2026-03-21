@@ -82,6 +82,9 @@ COPY --from=builder /app /app
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/public /data && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
+# Force cache-bust to avoid stale image build
+ARG CACHE_BUST=1
+
 # Copy FrankenPHP/Caddy and supervisord config
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 COPY docker/supervisor/supervisord.prod.conf /etc/supervisor/conf.d/supervisord.conf
