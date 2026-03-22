@@ -353,6 +353,16 @@ function MarkdownContent({ content }: MarkdownContentProps) {
             h4: makeHeading(4),
             h5: makeHeading(5),
             h6: makeHeading(6),
+            img({ src, alt }) {
+                return (
+                    <img
+                        src={src}
+                        alt={alt ?? ''}
+                        loading="lazy"
+                        className="rounded-lg border border-border"
+                    />
+                );
+            },
             pre({ children }) {
                 const child = React.Children.toArray(children)[0];
                 if (React.isValidElement(child) && child.type === 'code') {
@@ -388,16 +398,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                 const text = String(children);
                 const match = text.match(/^::youtube\[([a-zA-Z0-9_-]+)\]$/);
                 if (match) {
-                    return (
-                        <div className="relative my-6 aspect-video overflow-hidden rounded-lg border border-border">
-                            <iframe
-                                src={`https://www.youtube.com/embed/${match[1]}`}
-                                title="YouTube video"
-                                allowFullScreen
-                                className="absolute inset-0 h-full w-full"
-                            />
-                        </div>
-                    );
+                    return <YoutubeEmbed id={match[1]} />;
                 }
                 return <p {...props}>{children}</p>;
             },
@@ -442,5 +443,47 @@ function CopyButton({ code }: { code: string }) {
         >
             {copied ? 'Copied!' : 'Copy'}
         </button>
+    );
+}
+
+function YoutubeEmbed({ id }: { id: string }) {
+    const [active, setActive] = useState(false);
+    const [loaded, setLoaded] = useState(false);
+
+    if (!active) {
+        return (
+            <div
+                className="relative my-6 aspect-video cursor-pointer overflow-hidden rounded-lg border border-border"
+                onClick={() => setActive(true)}
+            >
+                <img
+                    src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+                    alt="YouTube video thumbnail"
+                    className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="rounded-full bg-black/70 px-5 py-3 text-2xl text-white">
+                        ▶
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative my-6 aspect-video overflow-hidden rounded-lg border border-border">
+            {!loaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground" />
+                </div>
+            )}
+            <iframe
+                src={`https://www.youtube.com/embed/${id}?autoplay=1`}
+                title="YouTube video"
+                allowFullScreen
+                onLoad={() => setLoaded(true)}
+                className="absolute inset-0 h-full w-full"
+            />
+        </div>
     );
 }
