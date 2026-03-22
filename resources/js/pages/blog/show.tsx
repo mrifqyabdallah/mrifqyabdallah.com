@@ -385,6 +385,16 @@ function MarkdownContent({ content }: MarkdownContentProps) {
                                     borderRadius: 0,
                                     border: '1px solid var(--border)',
                                     fontSize: '0.875em',
+                                    fontFamily:
+                                        "'Cascadia Code Variable', monospace",
+                                    fontWeight: 350,
+                                }}
+                                codeTagProps={{
+                                    style: {
+                                        fontFamily:
+                                            "'Cascadia Code Variable', monospace",
+                                        fontWeight: 350,
+                                    },
                                 }}
                             >
                                 {codeString}
