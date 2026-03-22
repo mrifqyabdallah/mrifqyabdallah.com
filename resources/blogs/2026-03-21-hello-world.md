@@ -2,7 +2,7 @@
 title: Hello, World
 creator: mrifqyabdallah
 tags: [meta]
-excerpt: A completely serious and totally necessary deep dive into printing text to a screen. Written by a human. Definitely a human. Please do not investigate further.
+excerpt: A dummy post to demonstrate how the blog renders markdown components.
 ---
 
 # Hello, World
@@ -419,7 +419,7 @@ Add a comment that says `// don't touch this`. Ship it.[^6]
 
 Here is a developer the exact moment their code works on the first try:
 
-![Two people high-fiving enthusiastically in a bright office](https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80)
+![Two people celebrating enthusiastically](/media/blogs/2026-03-21-hello-world-1.png)
 
 Here is the same developer after reading the PR review comments:
 
