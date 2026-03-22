@@ -1,7 +1,7 @@
 <?php
 
-require __DIR__.'/vendor/autoload.php';
-$app = require __DIR__.'/bootstrap/app.php';
+require '/app/vendor/autoload.php';
+$app = require '/app/bootstrap/app.php';
 
 $classesToPreload = [
     // Core/HTTP
@@ -101,10 +101,10 @@ foreach ($classesToPreload as $class) {
 }
 
 // Preload application directories
-preloadDirectory(__DIR__.'/app/Http/Controllers', '/\.php$/');
-preloadDirectory(__DIR__.'/app/Models', '/\.php$/');
-preloadDirectory(__DIR__.'/app/Jobs', '/\.php$/');
-preloadDirectory(__DIR__.'/app/Providers', '/\.php$/');
+preloadDirectory('/app/app/Http/Controllers', '/\.php$/');
+preloadDirectory('/app/app/Models', '/\.php$/');
+preloadDirectory('/app/app/Jobs', '/\.php$/');
+preloadDirectory('/app/app/Providers', '/\.php$/');
 
 // Free memory
 gc_collect_cycles();
