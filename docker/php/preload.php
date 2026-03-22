@@ -1,7 +1,7 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
-$app = require __DIR__ . '/bootstrap/app.php';
+require __DIR__.'/vendor/autoload.php';
+$app = require __DIR__.'/bootstrap/app.php';
 
 $classesToPreload = [
     // Core/HTTP
@@ -46,13 +46,14 @@ $classesToPreload = [
     \Inertia\Response::class,
 ];
 
-function preloadClass($class) {
+function preloadClass($class)
+{
     if (class_exists($class, false)) {
         // Already loaded
         return;
     }
 
-    if (!class_exists($class)) {
+    if (! class_exists($class)) {
         return;
     }
 
@@ -60,7 +61,7 @@ function preloadClass($class) {
 
     // Preload methods and their static variables
     foreach ($rc->getMethods() as $method) {
-        if ($method->isPublic() && !$method->isAbstract()) {
+        if ($method->isPublic() && ! $method->isAbstract()) {
             $method->getStaticVariables();
         }
     }
@@ -77,8 +78,9 @@ function preloadClass($class) {
     }
 }
 
-function preloadDirectory($dir, $pattern) {
-    if (!is_dir($dir)) {
+function preloadDirectory($dir, $pattern)
+{
+    if (! is_dir($dir)) {
         return;
     }
 
@@ -99,10 +101,10 @@ foreach ($classesToPreload as $class) {
 }
 
 // Preload application directories
-preloadDirectory(__DIR__ . '/app/Http/Controllers', '/\.php$/');
-preloadDirectory(__DIR__ . '/app/Models', '/\.php$/');
-preloadDirectory(__DIR__ . '/app/Jobs', '/\.php$/');
-preloadDirectory(__DIR__ . '/app/Providers', '/\.php$/');
+preloadDirectory(__DIR__.'/app/Http/Controllers', '/\.php$/');
+preloadDirectory(__DIR__.'/app/Models', '/\.php$/');
+preloadDirectory(__DIR__.'/app/Jobs', '/\.php$/');
+preloadDirectory(__DIR__.'/app/Providers', '/\.php$/');
 
 // Free memory
 gc_collect_cycles();
