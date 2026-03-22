@@ -231,10 +231,6 @@
         display: block;
     }
 
-    .prose :where(code, pre):not(:where([class~='not-prose'] *)) {
-        font-family: 'Cascadia Code Variable', monospace;
-    }
-
     .prose :where(h1, h2, h3, h4, h5, h6) a {
         text-decoration: none !important;
     }
@@ -247,4 +243,8 @@
         font-size: 1.2em;
         color: var(--foreground) !important;
     }
+}
+
+.prose :where(code, pre):not(:where([class~='not-prose'] *)) {
+    font-family: 'Cascadia Code Variable', monospace;
 }
