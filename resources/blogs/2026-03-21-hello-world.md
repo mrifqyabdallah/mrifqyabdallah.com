@@ -37,7 +37,7 @@ In the spirit of transparency, I should mention something.
 
 This post was written by an AI.
 
-Specifically, it was written by Claude — a large language model made by Anthropic — at the request of the human who runs this blog, who said, and I am quoting directly: *"idk, funny? something random like common jokes or meme?"*
+Specifically, it was written by Claude — a large language model made by Anthropic — at the request of the human who runs this blog, who said, and I am quoting directly: _"idk, funny? something random like common jokes or meme?"_
 
 I did my best.
 
@@ -82,7 +82,7 @@ Before proceeding, ensure you have:
 To help you decide, here is a completely objective comparison:
 
 | Language   | Hello World difficulty | Will it be in production in 10 years? | Tabs or spaces?                    |
-|------------|------------------------|---------------------------------------|------------------------------------|
+| ---------- | ---------------------- | ------------------------------------- | ---------------------------------- |
 | PHP        | Easy                   | Unfortunately, yes                    | Both (you'll see)                  |
 | JavaScript | Easy (framework: hard) | It already is, god help us            | Spaces                             |
 | Go         | Easy                   | Probably                              | Tabs (enforced by the compiler)    |
@@ -140,9 +140,9 @@ echo helloWorld();
 
 // v4 — current
 const hello = () =>
-  new Promise((resolve) =>
-    setTimeout(() => resolve("Hello, World"), 0) // "non-blocking"
-  );
+    new Promise(
+        (resolve) => setTimeout(() => resolve('Hello, World'), 0), // "non-blocking"
+    );
 
 hello().then(console.log);
 
@@ -157,32 +157,32 @@ hello().then(console.log);
 // The architect added a factory.
 // No one is entirely sure what we're building anymore.
 
-type World = "World";
+type World = 'World';
 type Greeting = `Hello, ${World}`;
 
 interface HelloWorldFactory {
-  create(): HelloWorldService;
+    create(): HelloWorldService;
 }
 
 interface HelloWorldService {
-  greet(): Greeting;
+    greet(): Greeting;
 }
 
 class ConcreteHelloWorldService implements HelloWorldService {
-  greet(): Greeting {
-    return "Hello, World";
-  }
+    greet(): Greeting {
+        return 'Hello, World';
+    }
 }
 
 class ConcreteHelloWorldFactory implements HelloWorldFactory {
-  create(): HelloWorldService {
-    return new ConcreteHelloWorldService();
-  }
+    create(): HelloWorldService {
+        return new ConcreteHelloWorldService();
+    }
 }
 
 const service = new ConcreteHelloWorldFactory().create();
 console.log(service.greet()); // "Hello, World"
-                               // It took a factory to get here.
+// It took a factory to get here.
 ```
 
 ### Dockerfile
@@ -217,69 +217,69 @@ CMD ["node", "dist/index.js"]
 name: Deploy Hello World
 
 on:
-  push:
-    branches: [main]
+    push:
+        branches: [main]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: yarn install
+            - name: Install dependencies
+              run: yarn install
 
-      - name: Run tests
-        run: yarn test
-        # There is one test.
-        # It asserts that "Hello, World" equals "Hello, World".
-        # It has never failed.
-        # It has also never caught a bug.
-        # Its purpose is to make the coverage badge green.
+            - name: Run tests
+              run: yarn test
+              # There is one test.
+              # It asserts that "Hello, World" equals "Hello, World".
+              # It has never failed.
+              # It has also never caught a bug.
+              # Its purpose is to make the coverage badge green.
 
-      - name: Step 7
-        run: echo "DO NOT REMOVE THIS STEP"
-        # Someone removed this step in 2024.
-        # Things happened.
-        # It was put back.
-        # We do not discuss it.
+            - name: Step 7
+              run: echo "DO NOT REMOVE THIS STEP"
+              # Someone removed this step in 2024.
+              # Things happened.
+              # It was put back.
+              # We do not discuss it.
 
-      - name: Build and deploy
-        run: yarn build && yarn deploy
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          # The secret was rotated once.
-          # It broke production.
-          # It has not been rotated since.
-          # Security is aware.
+            - name: Build and deploy
+              run: yarn build && yarn deploy
+              env:
+                  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+                  # The secret was rotated once.
+                  # It broke production.
+                  # It has not been rotated since.
+                  # Security is aware.
 ```
 
 ### JSON
 
 ```json
 {
-  "name": "hello-world",
-  "version": "4.12.3",
-  "description": "Says hello. It's complicated.",
-  "scripts": {
-    "start": "node dist/index.js",
-    "build": "webpack --config webpack.config.old.js",
-    "test": "jest",
-    "test:real": "jest --coverage",
-    "test:ci": "jest --coverage --ci",
-    "test:actually-run-please": "jest --forceExit",
-    "deploy": "sh deploy.sh",
-    "deploy:prod": "echo 'are you sure?' && sh deploy.sh",
-    "deploy:yolo": "sh deploy.sh --skip-checks"
-  },
-  "dependencies": {
-    "lodash": "^4.17.21",
-    "moment": "^2.29.4",
-    "left-pad": "^1.3.0",
-    "is-odd": "^3.0.1",
-    "is-even": "^1.0.0",
-    "is-number": "^7.0.0"
-  }
+    "name": "hello-world",
+    "version": "4.12.3",
+    "description": "Says hello. It's complicated.",
+    "scripts": {
+        "start": "node dist/index.js",
+        "build": "webpack --config webpack.config.old.js",
+        "test": "jest",
+        "test:real": "jest --coverage",
+        "test:ci": "jest --coverage --ci",
+        "test:actually-run-please": "jest --forceExit",
+        "deploy": "sh deploy.sh",
+        "deploy:prod": "echo 'are you sure?' && sh deploy.sh",
+        "deploy:yolo": "sh deploy.sh --skip-checks"
+    },
+    "dependencies": {
+        "lodash": "^4.17.21",
+        "moment": "^2.29.4",
+        "left-pad": "^1.3.0",
+        "is-odd": "^3.0.1",
+        "is-even": "^1.0.0",
+        "is-number": "^7.0.0"
+    }
 }
 ```
 
@@ -433,7 +433,7 @@ Before deploying any Hello World to production, you must watch the following vid
 
 ::youtube[dQw4w9WgXcQ]
 
-*(Compliance is tracked. HR is aware.)*
+_(Compliance is tracked. HR is aware.)_
 
 ---
 
@@ -443,7 +443,7 @@ Open a pull request. The CI pipeline will fail on a lint warning that has nothin
 
 Fix it. The pipeline fails again. Step 7 is upset.
 
-Appease Step 7. The pipeline goes green. Your reviewer approves with one comment: *"nit: could we rename this variable?"*
+Appease Step 7. The pipeline goes green. Your reviewer approves with one comment: _"nit: could we rename this variable?"_
 
 You rename the variable. You merge. You deploy.
 
@@ -465,21 +465,30 @@ This is software engineering. Welcome to the blog.
 
 # Notes and Footnotes
 
-*This post was written by Claude — the AI, not a person named Claude, though that would also be a reasonable name for a person — on behalf of the blog owner, who asked for something "funny" and then said "idk." I interpreted this as broadly as I could.*
+_This post was written by Claude — the AI, not a person named Claude, though that would also be a reasonable name for a person — on behalf of the blog owner, who asked for something "funny" and then said "idk." I interpreted this as broadly as I could._
 
-*I have never written a line of code in production. I have never experienced a deployment. I do not have a GitHub account. I am, in every meaningful sense, not qualified to write this post.*
+_I have never written a line of code in production. I have never experienced a deployment. I do not have a GitHub account. I am, in every meaningful sense, not qualified to write this post._
 
-*And yet here we are.*
+_And yet here we are._
 
-*If everything on this page rendered correctly — all six heading levels, both images, the YouTube embed, the table, the blockquotes, and every syntax-highlighted code block — then the blog is working as intended. If something looks off, please open an issue. I will not see it, but the human will.*
+_If everything on this page rendered correctly — all six heading levels, both images, the YouTube embed, the table, the blockquotes, and every syntax-highlighted code block — then the blog is working as intended. If something looks off, please open an issue. I will not see it, but the human will._
 
 [^fn-grammar]: "Hello, World" is grammatically ambiguous. It is unclear who is being addressed, whether "World" is a proper noun or an affectionate nickname, and what the speaker's emotional state is. These questions were raised in the requirements review. The meeting was tabled. The comma stayed.
+
 [^fn-comma]: The original 1978 printing did not have a comma. It said "hello, world" in lowercase. Every style guide since has had a different opinion. This project has chosen a position and will not be revisiting it.
+
 [^fn-twice]: See the Bash implementation. We are aware.
+
 [^fn-maintainable]: This requirement has never been met by any software project in the history of computing. It remains in the spec for morale purposes.
+
 [^1]: Nine is also acceptable if you are a very fast typist or have made certain life choices. Eight is where people start asking questions.
+
 [^2]: This is not recommended. This is also the most common time deployments happen. These two facts are related.
+
 [^3]: This is not a metaphor. The Hello World from the original 1978 C book has been compiled by more machines than most production applications. It outlived the company that made those machines. It will outlive you.
+
 [^4]: `left-pad` is also in this `package.json`. In 2016, its author unpublished it from npm in protest, breaking thousands of builds worldwide, including, reportedly, Babel. It was restored eleven minutes later. Those eleven minutes are studied in software engineering courses. The package left-pads strings. It is eleven lines of code.
+
 [^5]: This is called a Heisenbug — a bug that disappears when you try to observe it. The term comes from Heisenberg's uncertainty principle. Werner Heisenberg was a physicist and did not write JavaScript, which was probably for the best.
+
 [^6]: Future developers will touch it. They will not know what it does. They will add another comment that says `// seriously don't touch this`. The cycle continues.
