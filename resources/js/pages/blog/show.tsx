@@ -54,11 +54,15 @@ interface TocItem {
 }
 
 function extractHeadings(content: string): TocItem[] {
+    const stripped = content
+        .replace(/^(```|~~~)[\s\S]*?^\1/gm, '')
+        .replace(/`[^`]+`/g, '');
+
     const regex = /^(#{1,6})\s+(.+)$/gm;
     const items: TocItem[] = [];
     let match;
 
-    while ((match = regex.exec(content)) !== null) {
+    while ((match = regex.exec(stripped)) !== null) {
         const level = match[1].length;
         const text = match[2].trim();
         items.push({ id: slugify(text), text, level });
@@ -96,7 +100,6 @@ function TableOfContents({ items }: { items: TocItem[] }) {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll();
-
         return () => window.removeEventListener('scroll', handleScroll);
     }, [items]);
 
@@ -289,7 +292,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                     {tocItems.length > 0 && (
                         <aside className="hidden w-56 shrink-0 lg:block">
                             <div
-                                className="sticky top-16 rounded-lg p-4"
+                                className="sticky top-16 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg p-4"
                                 style={{
                                     backgroundImage: `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>")`,
                                     backgroundRepeat: 'repeat',
@@ -436,7 +439,7 @@ function CopyButton({ code }: { code: string }) {
     return (
         <button
             onClick={handleCopy}
-            className="absolute top-2 right-2 z-10 rounded border border-border bg-muted px-2 py-1 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+            className="absolute top-2 right-2 z-10 rounded border border-border bg-muted px-2 py-1 text-xs text-muted-foreground transition-opacity hover:text-foreground"
         >
             {copied ? 'Copied!' : 'Copy'}
         </button>
