@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+cron
+
+exec gosu www-data sh <<'EOF'
 if [ ! -d "public/storage" ]; then
     php artisan storage:link
 fi
@@ -12,7 +15,5 @@ php artisan view:clear
 php artisan optimize
 php artisan queue:restart
 
-gosu root cron
-
-# Start supervisord (manages FrankenPHP + queue worker)
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+exec gosu www-data /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+EOF
