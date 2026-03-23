@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Blog;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 
@@ -133,5 +134,43 @@ describe('GET /blog/{slug}/stats', function () {
     it('returns 404 for nonexistent blog', function (): void {
         $this->get(route('stats.post', 'non-existent-slug'))
             ->assertNotFound();
+    });
+});
+
+describe('GET /opcache', function () {
+    it('allows admin to access opcache page', function () {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->get('/opcache')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('stats/opcache')
+                ->has('data')
+                ->has('includeScripts')
+            );
+    });
+
+    it('denies non-admin from accessing opcache page', function () {
+        $user = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($user)
+            ->get('/opcache')
+            ->assertForbidden();
+    });
+
+    it('redirects guest to login', function () {
+        $this->get('/opcache')
+            ->assertRedirect('/login');
+    });
+
+    it('passes include_scripts param to the page', function () {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->get('/opcache?include_scripts=1')
+            ->assertInertia(fn ($page) => $page
+                ->where('includeScripts', true)
+            );
     });
 });

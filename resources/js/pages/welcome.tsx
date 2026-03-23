@@ -173,33 +173,34 @@ export default function Welcome({
                                         <ul>
                                             {websites.map(
                                                 (website: Website) => (
-                                                    <>
-                                                        <li className="relative flex items-center py-1">
-                                                            <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                                                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                                                    <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                                                </span>
+                                                    <li
+                                                        key={website.url}
+                                                        className="relative flex items-center py-1"
+                                                    >
+                                                        <span className="relative bg-white py-1 dark:bg-[#161615]">
+                                                            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
+                                                                <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
                                                             </span>
-                                                            <span>
-                                                                <Button
-                                                                    asChild
-                                                                    variant="link"
+                                                        </span>
+                                                        <span>
+                                                            <Button
+                                                                asChild
+                                                                variant="link"
+                                                            >
+                                                                <a
+                                                                    href={
+                                                                        website.url
+                                                                    }
+                                                                    target="_blank"
                                                                 >
-                                                                    <a
-                                                                        href={
-                                                                            website.url
-                                                                        }
-                                                                        target="_blank"
-                                                                    >
-                                                                        {
-                                                                            website.title
-                                                                        }
-                                                                        <ExternalLinkIcon />
-                                                                    </a>
-                                                                </Button>
-                                                            </span>
-                                                        </li>
-                                                    </>
+                                                                    {
+                                                                        website.title
+                                                                    }
+                                                                    <ExternalLinkIcon />
+                                                                </a>
+                                                            </Button>
+                                                        </span>
+                                                    </li>
                                                 ),
                                             )}
                                         </ul>
