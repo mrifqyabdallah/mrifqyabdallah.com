@@ -3,7 +3,6 @@ set -e
 
 cron
 
-exec gosu www-data sh <<'EOF'
 if [ ! -d "public/storage" ]; then
     php artisan storage:link
 fi
@@ -16,4 +15,3 @@ php artisan optimize
 php artisan queue:restart
 
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
-EOF
