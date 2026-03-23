@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import type { ComponentPropsWithoutRef } from 'react';
 import {
     SidebarGroup,
@@ -33,7 +34,7 @@ export function NavFooter({
                                 isActive={isCurrentUrl(item.href)}
                                 tooltip={{ children: item.title }}
                             >
-                                <a
+                                <Link
                                     href={toUrl(item.href)}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -42,7 +43,7 @@ export function NavFooter({
                                         <item.icon className="h-5 w-5" />
                                     )}
                                     <span>{item.title}</span>
-                                </a>
+                                </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
