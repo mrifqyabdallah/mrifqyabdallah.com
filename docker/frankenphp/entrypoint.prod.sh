@@ -15,5 +15,5 @@ php artisan view:clear
 php artisan optimize
 php artisan queue:restart
 
-exec gosu www-data /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 EOF
