@@ -12,7 +12,7 @@ php artisan view:clear
 php artisan optimize
 php artisan queue:restart
 
-cron
+gosu root cron
 
 # Start supervisord (manages FrankenPHP + queue worker)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
