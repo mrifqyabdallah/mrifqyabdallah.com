@@ -12,8 +12,6 @@ php artisan view:clear
 php artisan optimize
 php artisan queue:restart
 
-echo "* * * * * www-data cd /app && php artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/laravel
-chmod 644 /etc/cron.d/laravel
 cron
 
 # Start supervisord (manages FrankenPHP + queue worker)
