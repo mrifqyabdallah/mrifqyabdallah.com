@@ -97,10 +97,6 @@ RUN chmod +x /entrypoint.sh
 # Copy OPcache configuration
 COPY docker/php/php.ini docker/php/opcache.ini /usr/local/etc/php/conf.d/
 
-# Copy cronjob files
-COPY docker/php/cron /etc/cron.d/laravel
-RUN chmod 644 /etc/cron.d/laravel
-
 EXPOSE 80 443
 
 ENTRYPOINT ["/entrypoint.sh"]
