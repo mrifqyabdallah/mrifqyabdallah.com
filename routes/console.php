@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::call(function (): void {})->everyHour()
+Schedule::call(function (): void {})->hourly()
     ->description('Cron/scheduler heartbeat');
 
 Schedule::command('blog:stats')->dailyAt('02:30')
