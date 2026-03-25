@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+rm -f /var/run/cron*.pid
+crontab /app/docker/php/cron
 cron
 
 if [ ! -d "public/storage" ]; then
