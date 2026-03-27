@@ -34,8 +34,21 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 FROM runtime AS dev
 ARG UID=1000
 ARG GID=1000
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --gid ${GID} devuser \
-    && useradd --uid ${UID} --gid ${GID} --create-home --shell /bin/bash devuser
+    && useradd --uid ${UID} --gid ${GID} --create-home --shell /bin/bash devuser \
+    && echo "devuser ALL=(root) NOPASSWD: /bin/rm -f /var/run/cron*.pid, /usr/sbin/service cron start" \
+        > /etc/sudoers.d/devuser-root \
+    && chmod 0440 /etc/sudoers.d/devuser-root
+
+COPY docker/cron/dev /etc/cron.d/laravel
+RUN chmod 0644 /etc/cron.d/laravel
+
 USER devuser
 
 # =============================================================================

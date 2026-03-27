@@ -1,0 +1,1 @@
+* * * * * devuser cd /app && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1
