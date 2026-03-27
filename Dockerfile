@@ -96,9 +96,6 @@ COPY --from=builder /app /app
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/public /data && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
-# Force cache-bust to avoid stale image build
-ARG CACHE_BUST=1
-
 # Copy FrankenPHP/Caddy and supervisord config
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 COPY docker/supervisor/supervisord.prod.conf /etc/supervisor/conf.d/supervisord.conf
@@ -109,6 +106,10 @@ RUN chmod +x /entrypoint.sh
 
 # Copy OPcache configuration
 COPY docker/php/php.ini docker/php/opcache.ini /usr/local/etc/php/conf.d/
+
+# Copy cronjob files
+COPY docker/cron/prod /etc/cron.d/laravel
+RUN chmod 0644 /etc/cron.d/laravel
 
 EXPOSE 80 443
 

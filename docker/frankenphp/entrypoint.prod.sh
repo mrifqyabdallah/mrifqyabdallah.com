@@ -1,10 +1,6 @@
 #!/bin/sh
 set -e
 
-rm -f /var/run/cron*.pid
-crontab /app/docker/php/cron
-cron
-
 if [ ! -d "public/storage" ]; then
     php artisan storage:link
 fi
@@ -15,5 +11,8 @@ php artisan view:clear
 
 php artisan optimize
 php artisan queue:restart
+
+rm -f /var/run/cron*.pid
+cron
 
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
