@@ -21,8 +21,8 @@ if [ ! -d "node_modules" ]; then
     npm install
 fi
 
-# Start Vite dev server in the background
-npm run dev &
+sudo rm -f /var/run/cron*.pid
+sudo service cron start
 
 # Start supervisord (manages FrankenPHP + queue worker)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
