@@ -94,6 +94,31 @@ app:
 		docker compose exec app $(filter-out $@, $(MAKECMDGOALS)); \
 	fi
 
+LARAVEL_LOG_DIR = /app/storage/logs
+
+# List Laravel log files
+app.logs:
+	@docker compose exec app sh -c "ls -alht $(LARAVEL_LOG_DIR) | grep -v '^d'"
+
+# Read (tail) Laravel log file, default to latest log or specify a date
+# Usage: make app.log, make app.log 20 (date 20 this month), etc
+app.log:
+	@ARG=$(filter-out $@,$(MAKECMDGOALS)); \
+	if [ -z "$$ARG" ]; then \
+		docker compose exec app sh -c "tail -f \$$(ls -t $(LARAVEL_LOG_DIR)/laravel-*.log | head -1)"; \
+	elif echo "$$ARG" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$$'; then \
+		FULL_DATE=$$ARG; \
+		docker compose exec app tail -f $(LARAVEL_LOG_DIR)/laravel-$$FULL_DATE.log; \
+	elif echo "$$ARG" | grep -qE '^[0-9]{2}-[0-9]{2}$$'; then \
+		FULL_DATE=$$(date +%Y)-$$ARG; \
+		docker compose exec app tail -f $(LARAVEL_LOG_DIR)/laravel-$$FULL_DATE.log; \
+	elif echo "$$ARG" | grep -qE '^[0-9]{1,2}$$'; then \
+		FULL_DATE=$$(date +%Y-%m)-$$(printf '%02d' $$ARG); \
+		docker compose exec app tail -f $(LARAVEL_LOG_DIR)/laravel-$$FULL_DATE.log; \
+	else \
+		echo "Invalid date format. Use: make log, make log 20, make log 02-20, or make log 2025-02-20."; exit 1; \
+	fi
+
 # Run php artisan commands
 # Usage: make artisan migrate
 # Usage: make artisan "migrate:fresh --seed"
@@ -116,6 +141,15 @@ npm:
 # Usage: make supervisorctl status
 sctl:
 	docker compose exec app supervisorctl -c /etc/supervisor/conf.d/supervisord.conf $(filter-out $@, $(MAKECMDGOALS))
+
+# Check cron status and its jobs
+cron:
+	@PID=$$(docker compose exec app cat /var/run/crond.pid 2>/dev/null) && \
+		docker compose exec app cat /proc/$$PID/cmdline > /dev/null 2>&1 \
+		&& echo "Cron is running, pid $$PID" \
+		&& echo "\n=== /etc/cron.d ===" \
+		&& docker compose exec app sh -c "cat /etc/cron.d/*" \
+		|| echo "Cron is not running"
 
 # =============================================================================
 # PostgreSQL
