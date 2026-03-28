@@ -8,16 +8,7 @@ import {
     AlertTriangle,
     Trash2,
 } from 'lucide-react';
-import React, { useEffect, useState, useMemo } from 'react';
-import type { Components } from 'react-markdown';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import {
-    oneLight,
-    oneDark,
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -123,10 +114,7 @@ function TableOfContents({ items }: { items: TocItem[] }) {
     };
 
     return (
-        <nav className="space-y-1">
-            <p className="mb-3 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-                On this page
-            </p>
+        <nav className="space-y-1 overflow-y-auto">
             {items.map((item) => {
                 const indent = (item.level - minLevel) * 12;
                 const isActive = activeId === item.id;
@@ -151,6 +139,29 @@ function TableOfContents({ items }: { items: TocItem[] }) {
         </nav>
     );
 }
+
+function ContentSkeleton() {
+    return (
+        <div className="animate-pulse space-y-6">
+            {[
+                [100, 100, 90, 90, 80, 80],
+                [100, 100, 90, 90, 80, 80],
+            ].map((lines, i) => (
+                <div key={i} className="mt-12 space-y-3">
+                    {lines.map((w, j) => (
+                        <div
+                            key={j}
+                            className="h-4 rounded bg-muted-foreground/20"
+                            style={{ width: `${w}%` }}
+                        />
+                    ))}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+const MarkdownRenderer = lazy(() => import('@/components/markdown-renderer'));
 
 export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     const { auth } = usePage<SharedProps>().props;
@@ -284,21 +295,26 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                         </header>
 
                         {!isArchived && (
-                            <MarkdownContent content={blog.content} />
+                            <Suspense fallback={<ContentSkeleton />}>
+                                <MarkdownRenderer content={blog.content} />
+                            </Suspense>
                         )}
                     </div>
 
                     {/* TOC sidebar */}
-                    {tocItems.length > 0 && (
+                    {!isArchived && tocItems.length > 0 && (
                         <aside className="hidden w-56 shrink-0 lg:block">
                             <div
-                                className="sticky top-16 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg p-4"
+                                className="sticky top-16 flex max-h-[calc(100vh-5rem)] flex-col rounded-lg p-4"
                                 style={{
                                     backgroundImage: `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>")`,
                                     backgroundRepeat: 'repeat',
                                     backgroundSize: '200px 200px',
                                 }}
                             >
+                                <p className="mb-3 shrink-0 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                                    On this page
+                                </p>
                                 <TableOfContents items={tocItems} />
                             </div>
                         </aside>
@@ -306,194 +322,5 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
                 </div>
             </div>
         </BlogLayout>
-    );
-}
-
-interface MarkdownContentProps {
-    content: string;
-}
-
-function MarkdownContent({ content }: MarkdownContentProps) {
-    const [isDark, setIsDark] = useState(() =>
-        document.documentElement.classList.contains('dark'),
-    );
-
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            setIsDark(document.documentElement.classList.contains('dark'));
-        });
-        observer.observe(document.documentElement, {
-            attributeFilter: ['class'],
-        });
-        return () => observer.disconnect();
-    }, []);
-
-    const components = useMemo<Components>(() => {
-        const makeHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
-            return function Heading({
-                children,
-            }: {
-                children: React.ReactNode;
-            }) {
-                const id = slugify(String(children));
-                return React.createElement(
-                    `h${level}`,
-                    { id, className: 'scroll-mt-30' },
-                    <a href={`#${id}`} className="no-underline hover:underline">
-                        {children}
-                    </a>,
-                );
-            };
-        };
-
-        return {
-            h1: makeHeading(1),
-            h2: makeHeading(2),
-            h3: makeHeading(3),
-            h4: makeHeading(4),
-            h5: makeHeading(5),
-            h6: makeHeading(6),
-            img({ src, alt }) {
-                return (
-                    <img
-                        src={src}
-                        alt={alt ?? ''}
-                        loading="lazy"
-                        className="rounded-lg border border-border"
-                    />
-                );
-            },
-            pre({ children }) {
-                const child = React.Children.toArray(children)[0];
-                if (React.isValidElement(child) && child.type === 'code') {
-                    const { className, children: code } = child.props as {
-                        className?: string;
-                        children: string;
-                    };
-                    const lang =
-                        /language-(\w+)/.exec(className ?? '')?.[1] ?? 'text';
-                    const codeString = String(code).trimEnd();
-
-                    return (
-                        <div className="group relative">
-                            <CopyButton code={codeString} />
-                            <SyntaxHighlighter
-                                language={lang}
-                                style={isDark ? oneDark : oneLight}
-                                customStyle={{
-                                    margin: 0,
-                                    borderRadius: 0,
-                                    border: '1px solid var(--border)',
-                                    fontSize: '0.875em',
-                                    fontFamily:
-                                        "'Cascadia Code Variable', monospace",
-                                    fontWeight: 350,
-                                }}
-                                codeTagProps={{
-                                    style: {
-                                        fontFamily:
-                                            "'Cascadia Code Variable', monospace",
-                                        fontWeight: 350,
-                                    },
-                                }}
-                            >
-                                {codeString}
-                            </SyntaxHighlighter>
-                        </div>
-                    );
-                }
-                return <pre>{children}</pre>;
-            },
-            p({ children, ...props }) {
-                const text = String(children);
-                const match = text.match(/^::youtube\[([a-zA-Z0-9_-]+)\]$/);
-                if (match) {
-                    return <YoutubeEmbed id={match[1]} />;
-                }
-                return <p {...props}>{children}</p>;
-            },
-        };
-    }, [isDark]);
-
-    return (
-        <div className="prose prose-base max-w-none prose-neutral dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-a:underline prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-border prose-pre:bg-muted prose-img:rounded-lg prose-img:border prose-img:border-border">
-            <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
-                components={components}
-            >
-                {content}
-            </ReactMarkdown>
-        </div>
-    );
-}
-
-function CopyButton({ code }: { code: string }) {
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-        } catch {
-            const el = document.createElement('textarea');
-            el.value = code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-        }
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-        <button
-            onClick={handleCopy}
-            className="absolute top-2 right-2 z-10 rounded border border-border bg-muted px-2 py-1 text-xs text-muted-foreground transition-opacity hover:text-foreground"
-        >
-            {copied ? 'Copied!' : 'Copy'}
-        </button>
-    );
-}
-
-function YoutubeEmbed({ id }: { id: string }) {
-    const [active, setActive] = useState(false);
-    const [loaded, setLoaded] = useState(false);
-
-    if (!active) {
-        return (
-            <div
-                className="relative my-6 aspect-video cursor-pointer overflow-hidden rounded-lg border border-border"
-                onClick={() => setActive(true)}
-            >
-                <img
-                    src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
-                    alt="YouTube video thumbnail"
-                    className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="rounded-full bg-black/70 px-5 py-3 text-2xl text-white">
-                        ▶
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="relative my-6 aspect-video overflow-hidden rounded-lg border border-border">
-            {!loaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground" />
-                </div>
-            )}
-            <iframe
-                src={`https://www.youtube.com/embed/${id}?autoplay=1`}
-                title="YouTube video"
-                allowFullScreen
-                onLoad={() => setLoaded(true)}
-                className="absolute inset-0 h-full w-full"
-            />
-        </div>
     );
 }
