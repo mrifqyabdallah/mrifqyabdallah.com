@@ -44,7 +44,9 @@ interface TocItem {
     level: number;
 }
 
-function extractHeadings(content: string): TocItem[] {
+function extractHeadings(content: string | null): TocItem[] {
+    if (!content) return [];
+
     const stripped = content
         .replace(/^(```|~~~)[\s\S]*?^\1/gm, '')
         .replace(/`[^`]+`/g, '');
@@ -167,7 +169,7 @@ export default function BlogShow({ blog, viewCount, isArchived }: Props) {
     const { auth } = usePage<SharedProps>().props;
     const isAdmin = auth?.user?.is_admin ?? false;
 
-    const tocItems = extractHeadings(blog.content);
+    const tocItems = extractHeadings(blog?.content);
 
     const publishedDate = new Date(blog.published_at).toLocaleDateString(
         'en-US',
