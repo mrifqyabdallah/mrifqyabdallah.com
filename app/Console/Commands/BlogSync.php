@@ -6,7 +6,6 @@ use App\Enums\BlogStatus;
 use App\Models\Blog;
 use App\Services\BlogSyncService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class BlogSync extends Command
 {
@@ -55,7 +54,7 @@ class BlogSync extends Command
             $data = $this->syncService->parseFile($filename, $contents);
 
             if (! $data) {
-                $this->warn("  ⚠ Skipped (invalid format): {$filename}");
+                $this->warn("  ⚠ Skipped (invalid): {$filename}");
                 $skipped++;
 
                 continue;
@@ -65,26 +64,21 @@ class BlogSync extends Command
 
             $existing = Blog::where('source_file', $filename)->first();
 
-            DB::transaction(function () use ($data, $existing, &$created, &$updated) {
-                /** @var array<string, mixed> $blogData */
-                $blogData = array_merge($data, ['status' => BlogStatus::Published]);
+            Blog::updateOrCreate(
+                ['source_file' => $data['source_file']],
+                [...$data, 'status' => BlogStatus::Published]
+            );
 
-                Blog::updateOrCreate(
-                    ['source_file' => $data['source_file']],
-                    $blogData
-                );
+            $this->line(sprintf('  ✓ %s: %s',
+                $existing ? 'Updated' : 'Created',
+                $data['source_file'],
+            ));
 
-                $this->line(sprintf('  ✓ %s: %s',
-                    $existing ? 'Updated' : 'Created',
-                    $data['source_file'],
-                ));
-
-                if ($existing) {
-                    $updated++;
-                } else {
-                    $created++;
-                }
-            });
+            if ($existing) {
+                $updated++;
+            } else {
+                $created++;
+            }
         }
 
         // Archive any DB records whose files no longer exist
@@ -92,8 +86,12 @@ class BlogSync extends Command
             ->where('status', BlogStatus::Published)
             ->get();
 
+        if ($archived->isNotEmpty()) {
+            Blog::whereIn('id', $archived->pluck('id'))
+                ->update(['status' => BlogStatus::Archived]);
+        }
+
         foreach ($archived as $blog) {
-            $blog->update(['status' => BlogStatus::Archived]);
             $this->line("  ✗ Archived (file removed): {$blog->source_file}");
         }
 
