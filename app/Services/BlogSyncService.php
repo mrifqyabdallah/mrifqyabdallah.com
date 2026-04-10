@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Blog;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -94,8 +95,10 @@ class BlogSyncService
             return null;
         }
 
-        // Ensure slug is valid kebab-case
-        if (is_null($date) || ! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart)) {
+        // Ensure slug is valid kebab-case and unique
+        if (is_null($date) || ! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart) ||
+            Blog::where('slug', $slugPart)->where('source_file', '!=', $filename)->exists()
+        ) {
             return null;
         }
 
@@ -103,16 +106,6 @@ class BlogSyncService
             'date' => $date->toDateString(),
             'slug' => $slugPart,
         ];
-    }
-
-    /**
-     * Derive slug from filename.
-     */
-    public function slugFromFilename(string $filename): ?string
-    {
-        $parsed = $this->parseFilename($filename);
-
-        return $parsed ? $parsed['slug'] : null;
     }
 
     /**
@@ -127,7 +120,7 @@ class BlogSyncService
 
         // Validate filename format first
         if (! $this->parseFilename($filename)) {
-            $errors[] = 'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md)';
+            $errors[] = 'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md, and unique)';
         }
 
         $document = YamlFrontMatter::parse($contents);

@@ -6,10 +6,6 @@ beforeEach(function () {
     $this->service = new BlogSyncService;
 });
 
-// ---------------------------------------------------------------------------
-// parseFilename
-// ---------------------------------------------------------------------------
-
 describe('parseFilename', function () {
     it('extracts slug and date from a valid filename', function () {
         $result = $this->service->parseFilename('2026-03-11-my-first-blog.md');
@@ -49,25 +45,6 @@ describe('parseFilename', function () {
         expect($result['slug'])->toBe('my-blog');
     });
 });
-
-// ---------------------------------------------------------------------------
-// slugFromFilename
-// ---------------------------------------------------------------------------
-
-describe('slugFromFilename', function () {
-    it('returns slug from valid filename', function () {
-        expect($this->service->slugFromFilename('2026-03-11-hello-world.md'))
-            ->toBe('hello-world');
-    });
-
-    it('returns null for invalid filename', function () {
-        expect($this->service->slugFromFilename('invalid.md'))->toBeNull();
-    });
-});
-
-// ---------------------------------------------------------------------------
-// parseFile
-// ---------------------------------------------------------------------------
 
 describe('parseFile', function () {
     it('parses a valid markdown file', function () {
@@ -122,10 +99,6 @@ MD;
     });
 });
 
-// ---------------------------------------------------------------------------
-// validateFrontmatter
-// ---------------------------------------------------------------------------
-
 describe('validateFrontmatter', function () {
     it('returns no errors for a valid file', function () {
         $contents = <<<'MD'
@@ -149,7 +122,7 @@ MD;
         $errors = $this->service->validateFrontmatter('bad-filename.md', $contents);
 
         expect($errors)->toContain(
-            'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md)'
+            'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md, and unique)'
         );
     });
 
