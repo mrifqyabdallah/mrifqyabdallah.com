@@ -3,6 +3,7 @@
 use App\Jobs\GenerateBlogStats;
 use App\Models\Blog;
 use App\Models\BlogView;
+use App\Queries\BlogViewStatsQuery;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function (): void {
@@ -68,14 +69,20 @@ test('daily, monthly, and yearly views in the generated json has correct structu
     runBlogStatsJob();
 
     $data = readOverviewJson();
+    $daily_windows = BlogViewStatsQuery::DAILY_WINDOW_DAYS;
+    $monthly_windows = BlogViewStatsQuery::MONTHLY_WINDOW_MONTHS;
 
-    expect($data['daily'])->toHaveCount(1)
-        ->and($data['daily'][0]['views'])->toBe(4)
-        ->and($data['daily'][0]['date'])->toBe(today()->toDateString());
+    expect($data['daily'])->toHaveCount($daily_windows)
+        ->and($data['daily'][0]['views'])->toBe(0)
+        ->and($data['daily'][0]['date'])->toBe(today()->subDays($daily_windows - 1)->toDateString())
+        ->and(end($data['daily'])['views'])->toBe(4)
+        ->and(end($data['daily'])['date'])->toBe(today()->toDateString());
 
-    expect($data['monthly'])->toHaveCount(1)
-        ->and($data['monthly'][0]['views'])->toBe(4)
-        ->and($data['monthly'][0]['month'])->toBe(today()->format('Y-m'));
+    expect($data['monthly'])->toHaveCount($monthly_windows)
+        ->and($data['monthly'][0]['views'])->toBe(0)
+        ->and($data['monthly'][0]['month'])->toBe(today()->subMonths($monthly_windows - 1)->format('Y-m'))
+        ->and(end($data['monthly'])['views'])->toBe(4)
+        ->and(end($data['monthly'])['month'])->toBe(today()->format('Y-m'));
 
     expect($data['yearly'])->toHaveCount(1)
         ->and($data['yearly'][0]['views'])->toBe(4)

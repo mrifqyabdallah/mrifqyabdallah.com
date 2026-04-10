@@ -56,8 +56,9 @@ describe('daily()', function () {
 
         $results = blogQuery($this->now)->daily();
 
-        expect($results)->toHaveCount(1)
-            ->and($results[0]->views)->toBe(5);
+        expect($results)->toHaveCount(BlogViewStatsQuery::DAILY_WINDOW_DAYS)
+            ->and($results[0]->views)->toBe(0)
+            ->and(end($results)->views)->toBe(5);
     });
 
     it('excludes dates outside the 30-day window', function (): void {
@@ -89,8 +90,9 @@ describe('monthly()', function () {
 
         $results = blogQuery($this->now)->monthly();
 
-        expect($results)->toHaveCount(1)
-            ->and($results[0]->views)->toBe(10);
+        expect($results)->toHaveCount(BlogViewStatsQuery::MONTHLY_WINDOW_MONTHS)
+            ->and($results[0]->views)->toBe(0)
+            ->and(end($results)->views)->toBe(10);
     });
 
     it('returns BlogMonthlyView DTO', function (): void {

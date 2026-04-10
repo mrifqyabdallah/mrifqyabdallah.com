@@ -3,6 +3,7 @@
 use App\Jobs\GeneratePostStats;
 use App\Models\Blog;
 use App\Models\BlogView;
+use App\Queries\BlogViewStatsQuery;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function (): void {
@@ -60,25 +61,58 @@ test('total_views is sum across all years', function (): void {
     expect(readPublicJson("stats/blogpost/{$blog->id}.json")['total_views'])->toBe(8);
 });
 
+test('daily() generates data from the last 30 days, capped by the post\'s publication date', function (): void {
+    $oldBlog = Blog::factory()->create(['published_at' => today()->subDays(29)]);
+    $newerBlog = Blog::factory()->create(['published_at' => today()->subDays(28)]);
+    $newestBlog = Blog::factory()->create(['published_at' => today()->subDays(6)]);
+
+    collect([$oldBlog, $newerBlog, $newestBlog])->each(function (Blog $blog) {
+        BlogView::factory()->for($blog)->count(4)->create(['date' => today()->toDateString()]);
+
+        runPostStatsJob($blog->id);
+    });
+
+    expect(readPublicJson("stats/blogpost/{$oldBlog->id}.json")['daily'])->toHaveCount(30);
+    expect(readPublicJson("stats/blogpost/{$newerBlog->id}.json")['daily'])->toHaveCount(29);
+    expect(readPublicJson("stats/blogpost/{$newestBlog->id}.json")['daily'])->toHaveCount(7);
+});
+
+test('monthly() generates data from the last 12 months, capped by the post\'s publication month', function (): void {
+    $oldBlog = Blog::factory()->create(['published_at' => today()->subMonths(11)]);
+    $newerBlog = Blog::factory()->create(['published_at' => today()->subMonths(10)]);
+    $newestBlog = Blog::factory()->create(['published_at' => today()->subMonths(2)]);
+
+    collect([$oldBlog, $newerBlog, $newestBlog])->each(function (Blog $blog) {
+        BlogView::factory()->for($blog)->count(4)->create(['date' => today()->toDateString()]);
+
+        runPostStatsJob($blog->id);
+    });
+
+    expect(readPublicJson("stats/blogpost/{$oldBlog->id}.json")['monthly'])->toHaveCount(12);
+    expect(readPublicJson("stats/blogpost/{$newerBlog->id}.json")['monthly'])->toHaveCount(11);
+    expect(readPublicJson("stats/blogpost/{$newestBlog->id}.json")['monthly'])->toHaveCount(3);
+});
+
 test('daily, monthly, and yearly views in the generated json has correct structure', function (): void {
-    $blog = Blog::factory()->create();
+    $blog = Blog::factory()->create(['published_at' => today()->subYear()]);
     BlogView::factory()->for($blog)->count(4)->create(['date' => today()->toDateString()]);
 
     runPostStatsJob($blog->id);
 
     $data = readPublicJson("stats/blogpost/{$blog->id}.json");
 
-    expect($data['daily'])->toHaveCount(1)
-        ->and($data['daily'][0]['views'])->toBe(4)
-        ->and($data['daily'][0]['date'])->toBe(today()->toDateString());
+    expect(end($data['daily'])['views'])->toBe(4)
+        ->and(end($data['daily'])['date'])->toBe(today()->toDateString())
+        ->and($data['daily'][0]['views'])->toBe(0)
+        ->and($data['daily'][0]['date'])->toBe(today()->subDays(BlogViewStatsQuery::DAILY_WINDOW_DAYS - 1)->toDateString());
 
-    expect($data['monthly'])->toHaveCount(1)
-        ->and($data['monthly'][0]['views'])->toBe(4)
-        ->and($data['monthly'][0]['month'])->toBe(today()->format('Y-m'));
+    expect(end($data['monthly'])['views'])->toBe(4)
+        ->and(end($data['monthly'])['month'])->toBe(today()->format('Y-m'))
+        ->and($data['monthly'][0]['views'])->toBe(0)
+        ->and($data['monthly'][0]['month'])->toBe(today()->subMonths(BlogViewStatsQuery::MONTHLY_WINDOW_MONTHS - 1)->format('Y-m'));
 
-    expect($data['yearly'])->toHaveCount(1)
-        ->and($data['yearly'][0]['views'])->toBe(4)
-        ->and($data['yearly'][0]['year'])->toBe(today()->format('Y'));
+    expect(end($data['yearly'])['views'])->toBe(4)
+        ->and(end($data['yearly'])['year'])->toBe(today()->format('Y'));
 });
 
 test('generated_at is an iso8601 string', function (): void {
