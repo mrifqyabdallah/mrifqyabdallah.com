@@ -63,6 +63,16 @@ interface Props {
     stats: PostStatsView | null;
 }
 
+interface RechartsTickProps {
+    x: number;
+    y: number;
+    payload: {
+        value: string;
+        offset: number;
+    };
+    index: number;
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function formatDate(str: string) {
@@ -81,13 +91,58 @@ function formatMonth(str: string) {
 }
 
 function formatNumber(n: number) {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-    if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
-    return String(n);
+    return new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 2,
+    }).format(n);
 }
 
 function peakViews(rows: { views: number }[]) {
     return rows.length ? Math.max(...rows.map((r) => r.views)) : 0;
+}
+
+function DailyTick(props: RechartsTickProps & { data: PostDailyView[] }) {
+    const { x, y, payload, index, data } = props;
+    const date = new Date(data[index]?.date ?? payload.value);
+    const day = date.getDate();
+
+    const isFirstOfMonth =
+        index === 0 ||
+        new Date(data[index - 1]?.date).getMonth() !== date.getMonth();
+
+    const month = isFirstOfMonth
+        ? date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+        : null;
+
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text
+                x={0}
+                y={0}
+                dy={12}
+                textAnchor="middle"
+                fontSize={10}
+                fill="currentColor"
+                className="fill-muted-foreground"
+            >
+                {day}
+            </text>
+            {month && (
+                <text
+                    x={0}
+                    y={0}
+                    dy={24}
+                    textAnchor="middle"
+                    fontSize={10}
+                    fontWeight={600}
+                    fill="currentColor"
+                    className="fill-foreground"
+                >
+                    {month}
+                </text>
+            )}
+        </g>
+    );
 }
 
 // ── sub-components ────────────────────────────────────────────────────────────
@@ -218,7 +273,20 @@ function ViewsChart({
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="label" {...axisProps} />
+                <XAxis
+                    dataKey="label"
+                    {...(period === 'daily'
+                        ? {
+                              tickLine: false,
+                              axisLine: false,
+                              height: 40,
+                              interval: 0,
+                              tick: (props: RechartsTickProps) => (
+                                  <DailyTick {...props} data={stats.daily} />
+                              ),
+                          }
+                        : axisProps)}
+                />
                 <YAxis {...axisProps} tickFormatter={formatNumber} />
                 <ChartTooltip
                     cursor={false}
