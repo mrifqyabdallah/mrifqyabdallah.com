@@ -38,7 +38,8 @@ class Blog extends Model
     #[Scope]
     protected function published(Builder $query): void
     {
-        $query->where('status', BlogStatus::Published);
+        $query->where('status', BlogStatus::Published)
+            ->whereNowOrPast('published_at');
     }
 
     /** @param Builder<Blog> $query */

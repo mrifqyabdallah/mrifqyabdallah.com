@@ -36,6 +36,16 @@ describe('GET /blog', function () {
             );
     });
 
+    it('excludes upcoming blogs', function () {
+        Blog::factory()->published()->count(2)->create();
+        Blog::factory()->upcoming()->create();
+
+        $this->get(route('blog.index'))
+            ->assertInertia(fn ($page) => $page
+                ->has('blogs.data', 2)
+            );
+    });
+
     it('filters by search term', function () {
         Blog::factory()->published()->create(['title' => 'Laravel Tips']);
         Blog::factory()->published()->create(['title' => 'React Patterns']);

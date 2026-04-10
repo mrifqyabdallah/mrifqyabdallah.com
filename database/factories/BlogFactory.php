@@ -140,6 +140,14 @@ class BlogFactory extends Factory
         return $this->state(['status' => BlogStatus::Published]);
     }
 
+    public function upcoming(): static
+    {
+        return $this->state([
+            'status' => BlogStatus::Published,
+            'published_at' => fake()->dateTimeBetween('1 week', '1 month')->format('Y-m-d'),
+        ]);
+    }
+
     public function archived(): static
     {
         return $this->state(['status' => BlogStatus::Archived]);
