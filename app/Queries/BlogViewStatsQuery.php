@@ -10,14 +10,16 @@ use App\Dto\PostTotalView;
 use App\Models\Blog;
 use App\Models\BlogView;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\DB;
 
 final class BlogViewStatsQuery
 {
-    private const DAILY_WINDOW_DAYS = 30;
+    const DAILY_WINDOW_DAYS = 30;
 
-    private const MONTHLY_WINDOW_MONTHS = 12;
+    const MONTHLY_WINDOW_MONTHS = 12;
 
-    private const TOP_POSTS_LIMIT = 10;
+    const TOP_POSTS_LIMIT = 10;
 
     public function __construct(
         private readonly CarbonImmutable $now,
@@ -43,17 +45,21 @@ final class BlogViewStatsQuery
     /** @return list<BlogDailyView> */
     public function daily(): array
     {
-        $cutoff = $this->now->copy()
+        $cutoff = $this->now
             ->subDays(self::DAILY_WINDOW_DAYS - 1)
             ->toDateString();
 
-        $data = BlogView::query()
-            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') AS view_date, COUNT(*) AS views")
-            ->where('date', '>=', $cutoff)
+        $data = DB::table(DB::raw("generate_series('$cutoff'::date, '{$this->now->toDateString()}'::date, '1 day'::interval) AS calendar(date)"))
+            ->leftJoin('blog_views', function (JoinClause $join) {
+                $join->on('calendar.date', '=', DB::raw('blog_views.date::date'));
+            })
+            ->selectRaw("TO_CHAR(calendar.date, 'YYYY-MM-DD') AS view_date")
+            ->selectRaw('COUNT(blog_views.id) AS views')
+            ->where('calendar.date', '>=', $cutoff)
             ->groupBy('view_date')
             ->orderBy('view_date')
             ->get()
-            ->map(static fn (BlogView $row): BlogDailyView => new BlogDailyView(
+            ->map(static fn (object $row): BlogDailyView => new BlogDailyView(
                 date: (string) $row->view_date, // @phpstan-ignore-line
                 views: (int) $row->views, // @phpstan-ignore-line
             ))
@@ -65,18 +71,29 @@ final class BlogViewStatsQuery
     /** @return list<BlogMonthlyView> */
     public function monthly(): array
     {
-        $cutoff = $this->now->copy()
+        $cutoff = $this->now
             ->subMonths(self::MONTHLY_WINDOW_MONTHS - 1)
             ->startOfMonth()
             ->toDateString();
 
-        $data = BlogView::query()
-            ->selectRaw("TO_CHAR(date, 'YYYY-MM') AS month, COUNT(*) AS views")
-            ->where('date', '>=', $cutoff)
+        $data = DB::table(DB::raw("generate_series(
+                    date_trunc('month', '$cutoff'::date), 
+                    date_trunc('month', '{$this->now->toDateString()}'::date), 
+                    '1 month'::interval
+                ) AS calendar(month)"))
+            ->leftJoin('blog_views', function (JoinClause $join) {
+                $join->on(
+                    DB::raw('calendar.month'),
+                    '=',
+                    DB::raw("date_trunc('month', blog_views.date)")
+                );
+            })
+            ->selectRaw("TO_CHAR(calendar.month, 'YYYY-MM') AS month")
+            ->selectRaw('COUNT(blog_views.id) AS views')
             ->groupByRaw('month')
             ->orderByRaw('month')
             ->get()
-            ->map(static fn (BlogView $row): BlogMonthlyView => new BlogMonthlyView(
+            ->map(static fn (object $row): BlogMonthlyView => new BlogMonthlyView(
                 month: (string) $row->month,  // @phpstan-ignore-line
                 views: (int) $row->views,     // @phpstan-ignore-line
             ))

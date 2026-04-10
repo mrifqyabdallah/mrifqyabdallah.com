@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\BlogStatus;
 use App\Jobs\GenerateBlogStats;
 use App\Jobs\GeneratePostStats;
 use App\Models\Blog;
 use App\Models\BlogView;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 
 class BlogStats extends Command
 {
@@ -15,7 +17,9 @@ class BlogStats extends Command
      *
      * @var string
      */
-    protected $signature = 'blog:stats {--all : Regenerate stats for every blog post, not just ones active today}';
+    protected $signature = 'blog:stats 
+                            {--today : Only regenerate stats for viewed blog post today}
+                            {--archived : Include archived blog post to be proccessed}';
 
     /**
      * The console command description.
@@ -29,17 +33,19 @@ class BlogStats extends Command
      */
     public function handle(): int
     {
-        if ((bool) $this->option('all')) {
-            return $this->generateAll();
+        if ((bool) $this->option('today')) {
+            return $this->generateToday();
         }
 
-        return $this->generateToday();
+        return $this->generateAll();
     }
 
     private function generateAll(): int
     {
         /** @var list<int> $blogIds */
-        $blogIds = Blog::query()->pluck('id')->all();
+        $blogIds = Blog::query()
+            ->when(! $this->option('archived'), fn (Builder $q) => $q->published())
+            ->pluck('id')->all();
 
         if (empty($blogIds)) {
             $this->components->warn('No blog posts found.');
@@ -56,6 +62,9 @@ class BlogStats extends Command
     {
         /** @var list<int> $activeBlogIds */
         $activeBlogIds = BlogView::query()
+            ->when(! $this->option('archived'), function (Builder $q) {
+                $q->whereRelation('blog', 'status', BlogStatus::Published);
+            })
             ->where('date', today()->toDateString())
             ->distinct()
             ->pluck('blog_id')
