@@ -55,11 +55,10 @@ final class PostViewStatsQuery
             ? $this->blog->published_at->startOfDay()
             : $windowStart;
 
-        $data = DB::table(DB::raw("generate_series(
-                    '{$startDate->toDateString()}'::date,
-                    '{$this->now->toDateString()}'::date,
-                    '1 day'::interval
-                ) AS calendar(date)"))
+        $data = DB::query()->fromRaw(
+            "generate_series(?::date, ?::date, '1 day'::interval) AS calendar(date)",
+            [$startDate->toDateString(), $this->now->toDateString()],
+        )
             ->leftJoin('blog_views', function (JoinClause $join) {
                 $join->on('calendar.date', '=', DB::raw('blog_views.date::date'))
                     ->where('blog_views.blog_id', '=', $this->blog->id);
@@ -84,11 +83,10 @@ final class PostViewStatsQuery
         $published_at = $this->blog->published_at->startOfMonth();
         $startDate = $published_at->gt($windowStart) ? $published_at : $windowStart;
 
-        $data = DB::table(DB::raw("generate_series(
-                    date_trunc('month', '{$startDate->toDateString()}'::date), 
-                    date_trunc('month', '{$this->now->toDateString()}'::date), 
-                    '1 month'::interval
-                ) AS calendar(month)"))
+        $data = DB::query()->fromRaw(
+            "generate_series(date_trunc('month', ?::date), date_trunc('month', ?::date), '1 month'::interval) AS calendar(month)",
+            [$startDate->toDateString(), $this->now->toDateString()],
+        )
             ->leftJoin('blog_views', function (JoinClause $join) {
                 $join->on(DB::raw('calendar.month'), '=', DB::raw("date_trunc('month', blog_views.date)"))
                     ->where('blog_views.blog_id', '=', $this->blog->id);

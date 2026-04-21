@@ -49,7 +49,10 @@ final class BlogViewStatsQuery
             ->subDays(self::DAILY_WINDOW_DAYS - 1)
             ->toDateString();
 
-        $data = DB::table(DB::raw("generate_series('$cutoff'::date, '{$this->now->toDateString()}'::date, '1 day'::interval) AS calendar(date)"))
+        $data = DB::query()->fromRaw(
+            "generate_series(?::date, ?::date, '1 day'::interval) AS calendar(date)",
+            [$cutoff, $this->now->toDateString()],
+        )
             ->leftJoin('blog_views', function (JoinClause $join) {
                 $join->on('calendar.date', '=', DB::raw('blog_views.date::date'));
             })
@@ -76,17 +79,12 @@ final class BlogViewStatsQuery
             ->startOfMonth()
             ->toDateString();
 
-        $data = DB::table(DB::raw("generate_series(
-                    date_trunc('month', '$cutoff'::date), 
-                    date_trunc('month', '{$this->now->toDateString()}'::date), 
-                    '1 month'::interval
-                ) AS calendar(month)"))
+        $data = DB::query()->fromRaw(
+            "generate_series(date_trunc('month', ?::date), date_trunc('month', ?::date), '1 month'::interval) AS calendar(month)",
+            [$cutoff, $this->now->toDateString()],
+        )
             ->leftJoin('blog_views', function (JoinClause $join) {
-                $join->on(
-                    DB::raw('calendar.month'),
-                    '=',
-                    DB::raw("date_trunc('month', blog_views.date)")
-                );
+                $join->on(DB::raw('calendar.month'), '=', DB::raw("date_trunc('month', blog_views.date)"));
             })
             ->selectRaw("TO_CHAR(calendar.month, 'YYYY-MM') AS month")
             ->selectRaw('COUNT(blog_views.id) AS views')
@@ -94,8 +92,8 @@ final class BlogViewStatsQuery
             ->orderByRaw('month')
             ->get()
             ->map(static fn (object $row): BlogMonthlyView => new BlogMonthlyView(
-                month: (string) $row->month,  // @phpstan-ignore-line
-                views: (int) $row->views,     // @phpstan-ignore-line
+                month: (string) $row->month, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
             ->all();
 
@@ -111,8 +109,8 @@ final class BlogViewStatsQuery
             ->orderByRaw('year')
             ->get()
             ->map(static fn (BlogView $row): BlogYearlyView => new BlogYearlyView(
-                year: (string) $row->year,    // @phpstan-ignore-line
-                views: (int) $row->views,     // @phpstan-ignore-line
+                year: (string) $row->year, // @phpstan-ignore-line
+                views: (int) $row->views, // @phpstan-ignore-line
             ))
             ->all();
 
