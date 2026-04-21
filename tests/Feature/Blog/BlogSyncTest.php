@@ -2,48 +2,17 @@
 
 use App\Enums\BlogStatus;
 use App\Models\Blog;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
-beforeEach(function (): void {
-    $this->blogsPath = resource_path('blogs');
-    File::ensureDirectoryExists($this->blogsPath);
+it('fails when blogs disk does not exist', function (): void {
+    config(['filesystems.disks.blogs.root' => '/nonexistent/path']);
+
+    $this->artisan('blogs:sync')->assertFailed();
 });
-
-afterEach(function (): void {
-    File::cleanDirectory($this->blogsPath);
-});
-
-function validMarkdown(
-    string $title = 'Hello World',
-    string $creator = 'John',
-    string $excerpt = 'Short excerpt',
-    array $tags = ['laravel', 'php'],
-    string $body = 'This is the body content.',
-): string {
-    $tagsYaml = implode(', ', array_map(fn ($t) => $t, $tags));
-
-    return <<<MD
----
-title: "{$title}"
-creator: "{$creator}"
-excerpt: "{$excerpt}"
-tags: [{$tagsYaml}]
----
-
-{$body}
-MD;
-}
-
-function putBlogFile(string $filename, string $contents): void
-{
-    File::put(resource_path("blogs/{$filename}"), $contents);
-}
 
 describe('blogs:sync', function () {
-    it('fails when blogs directory does not exist', function (): void {
-        File::deleteDirectory(resource_path('blogs'));
-
-        $this->artisan('blogs:sync')->assertFailed();
+    beforeEach(function (): void {
+        Storage::fake('blogs');
     });
 
     it('warns when no markdown files found', function (): void {
@@ -53,7 +22,7 @@ describe('blogs:sync', function () {
     });
 
     it('creates a new blog from a valid markdown file', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')->assertSuccessful();
 
@@ -61,7 +30,7 @@ describe('blogs:sync', function () {
     });
 
     it('sets status to published on create', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')->assertSuccessful();
 
@@ -70,10 +39,10 @@ describe('blogs:sync', function () {
     });
 
     it('updates an existing blog', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
         $this->artisan('blogs:sync')->assertSuccessful();
 
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown(title: 'Updated Title'));
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown(title: 'Updated Title'));
         $this->artisan('blogs:sync')->assertSuccessful();
 
         expect(Blog::where('source_file', '2026-03-21-hello-world.md')->first()->title)
@@ -82,7 +51,7 @@ describe('blogs:sync', function () {
     });
 
     it('skips a file with invalid filename format', function (): void {
-        putBlogFile('invalid-filename.md', validMarkdown());
+        putBlogFile('invalid-filename.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')
             ->expectsOutputToContain('Skipped (invalid)')
@@ -135,7 +104,7 @@ describe('blogs:sync', function () {
     });
 
     it('outputs correct summary counts', function (): void {
-        $existing = Blog::factory()->create([
+        Blog::factory()->create([
             'source_file' => '2026-03-20-existing-post.md',
             'status' => BlogStatus::Published,
         ]);
@@ -145,9 +114,9 @@ describe('blogs:sync', function () {
             'status' => BlogStatus::Published,
         ]);
 
-        putBlogFile('2026-03-20-existing-post.md', validMarkdown(title: 'Updated'));
-        putBlogFile('2026-03-21-new-post.md', validMarkdown());
-        putBlogFile('invalid-file.md', validMarkdown());
+        putBlogFile('2026-03-20-existing-post.md', generateBlogMarkdown(title: 'Updated'));
+        putBlogFile('2026-03-21-new-post.md', generateBlogMarkdown());
+        putBlogFile('invalid-file.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')
             ->expectsOutputToContain('created: 1, updated: 1, archived: 1, skipped: 1')
@@ -155,7 +124,7 @@ describe('blogs:sync', function () {
     });
 
     it('does not archive blogs that still have their file present', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
         $this->artisan('blogs:sync')->assertSuccessful();
 
         $blog = Blog::where('source_file', '2026-03-21-hello-world.md')->first();
@@ -163,7 +132,7 @@ describe('blogs:sync', function () {
     });
 
     it('sets the correct slug from the filename', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')->assertSuccessful();
 
@@ -171,7 +140,7 @@ describe('blogs:sync', function () {
     });
 
     it('sets published_at from the filename date', function (): void {
-        putBlogFile('2026-03-21-hello-world.md', validMarkdown());
+        putBlogFile('2026-03-21-hello-world.md', generateBlogMarkdown());
 
         $this->artisan('blogs:sync')->assertSuccessful();
 

@@ -6,6 +6,7 @@ use App\Enums\BlogStatus;
 use App\Models\Blog;
 use App\Services\BlogSyncService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class BlogSync extends Command
 {
@@ -21,15 +22,25 @@ class BlogSync extends Command
 
     public function handle(): int
     {
-        $blogsPath = resource_path('blogs');
+        $root = config()->string('filesystems.disks.blogs.root');
 
-        if (! is_dir($blogsPath)) {
-            $this->error("Directory not found: {$blogsPath}");
+        if (! is_dir($root)) {
+            $this->error("Directory not found: {$root}");
 
             return self::FAILURE;
         }
 
-        $files = glob("{$blogsPath}/*.md") ?: [];
+        $disk = Storage::disk('blogs');
+
+        if (! $disk->exists('/')) {
+            $this->error('Directory not found');
+
+            return self::FAILURE;
+        }
+
+        /** @var array<string> $files */
+        $files = $disk->files('/');
+        $files = array_filter($files, fn ($f) => str_ends_with($f, '.md'));
 
         if (empty($files)) {
             $this->warn('No markdown files found in resources/blogs/');
@@ -40,9 +51,8 @@ class BlogSync extends Command
         $updated = 0;
         $skipped = 0;
 
-        foreach ($files as $filePath) {
-            $filename = basename($filePath);
-            $contents = file_get_contents($filePath);
+        foreach ($files as $filename) {
+            $contents = $disk->get($filename);
 
             if (! $contents) {
                 $this->warn("  ⚠ Skipped (failed to get file): {$filename}");

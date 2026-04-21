@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,8 +15,8 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\LazilyRefreshDatabase::class)
+pest()->extend(TestCase::class)
+    ->use(LazilyRefreshDatabase::class)
     ->in('Feature', 'Unit');
 
 /*
@@ -41,7 +45,28 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function generateBlogMarkdown(
+    string $title = 'Hello World',
+    string $creator = 'John',
+    string $excerpt = 'Short excerpt',
+    array $tags = ['laravel', 'php'],
+    string $body = 'This is the body content.',
+): string {
+    $tagsYaml = implode(', ', array_map(fn ($t) => $t, $tags));
+
+    return <<<MD
+---
+title: "{$title}"
+creator: "{$creator}"
+excerpt: "{$excerpt}"
+tags: [{$tagsYaml}]
+---
+
+{$body}
+MD;
+}
+
+function putBlogFile(string $filename, string $contents): void
 {
-    // ..
+    Storage::disk('blogs')->put($filename, $contents);
 }

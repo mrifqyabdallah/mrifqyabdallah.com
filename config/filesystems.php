@@ -60,6 +60,11 @@ return [
             'report' => false,
         ],
 
+        'blogs' => [
+            'driver' => 'local',
+            'root' => resource_path('blogs'),
+        ],
+
     ],
 
     /*
