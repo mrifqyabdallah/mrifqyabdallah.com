@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\BlogSyncService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class BlogValidate extends Command
 {
@@ -18,22 +19,28 @@ class BlogValidate extends Command
 
     public function handle(): int
     {
-        $blogsPath = resource_path('blogs');
+        $root = config()->string('filesystems.disks.blogs.root');
         $filesOption = $this->option('files');
 
-        if (! is_dir($blogsPath)) {
-            $this->error("Directory not found: {$blogsPath}");
+        if (! is_dir($root)) {
+            $this->error("Directory not found: {$root}");
 
             return self::FAILURE;
         }
 
+        $disk = Storage::disk('blogs');
+
         if ($filesOption) {
             $files = array_map(
-                fn ($f) => $blogsPath.'/'.trim(basename($f)),
+                fn ($f) => trim(basename($f)),
                 explode(',', $filesOption)
             );
         } else {
-            $files = glob("{$blogsPath}/*.md");
+            /** @var array<string> $files_in_disk */
+            $files_in_disk = $disk->files('/');
+            $files = collect($files_in_disk)
+                ->filter(fn ($f) => str_ends_with($f, '.md'))
+                ->all();
         }
 
         if (empty($files)) {
@@ -44,18 +51,17 @@ class BlogValidate extends Command
 
         $hasErrors = false;
 
-        foreach ($files as $filePath) {
-            if (! file_exists($filePath)) {
-                $this->warn("  ⚠ File not found: {$filePath}");
+        foreach ($files as $filename) {
+            if (! $disk->exists($filename)) {
+                $this->warn("  ⚠ File not found: {$filename}");
 
                 continue;
             }
 
-            $filename = basename($filePath);
-            $contents = file_get_contents($filePath);
+            $contents = $disk->get($filename);
 
             if (! $contents) {
-                $this->warn("  ⚠ Failed to get content: {$filePath}");
+                $this->warn("  ⚠ Failed to get content: {$filename}");
 
                 continue;
             }
