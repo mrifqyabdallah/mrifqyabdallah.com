@@ -139,7 +139,7 @@ describe('RecordBlogView — Error handling', function () {
         $blog = Blog::factory()->published()->create();
         $job = new RecordBlogView($blog->id, null, 'test-visitor-hash');
 
-        $job->failed(new \RuntimeException('Something went wrong'));
+        $job->failed(new RuntimeException('Something went wrong'));
 
         Log::shouldHaveReceived('warning')
             ->once()

@@ -6,7 +6,9 @@ use App\Enums\BlogStatus;
 use App\Exceptions\BlogNotFoundException;
 use App\Jobs\RecordBlogView;
 use App\Models\Blog;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -56,9 +58,9 @@ class BlogController extends Controller
     }
 
     /**
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
-    public function destroy(Request $request, Blog $blog): \Illuminate\Http\RedirectResponse
+    public function destroy(Request $request, Blog $blog): RedirectResponse
     {
         Gate::authorize('delete', $blog);
 
