@@ -1,49 +1,74 @@
 <?php
 
+use Illuminate\Auth\AuthManager;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Container\Container;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
+use Illuminate\Queue\Jobs\Job;
+use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\Worker;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Router;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Str;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Inertia\Inertia;
+use Inertia\Response;
+
 require '/app/vendor/autoload.php';
 $app = require '/app/bootstrap/app.php';
 
 $classesToPreload = [
     // Core/HTTP
-    \Illuminate\Http\Request::class,
-    \Illuminate\Http\Response::class,
-    \Illuminate\Routing\Router::class,
-    \Illuminate\Foundation\Application::class,
+    Request::class,
+    Illuminate\Http\Response::class,
+    Router::class,
+    Application::class,
 
     // Database/Eloquent
-    \Illuminate\Database\Eloquent\Model::class,
-    \Illuminate\Database\Eloquent\Builder::class,
-    \Illuminate\Database\Query\Builder::class,
-    \Illuminate\Database\Eloquent\Relations\Relation::class,
-    \Illuminate\Database\Eloquent\Collection::class,
+    Model::class,
+    Builder::class,
+    Illuminate\Database\Query\Builder::class,
+    Relation::class,
+    Illuminate\Database\Eloquent\Collection::class,
 
     // Container/Support
-    \Illuminate\Container\Container::class,
-    \Illuminate\Support\Collection::class,
-    \Illuminate\Support\Str::class,
-    \Illuminate\Support\Arr::class,
-    \Illuminate\Support\Facades\Facade::class,
+    Container::class,
+    Collection::class,
+    Str::class,
+    Arr::class,
+    Facade::class,
 
     // Common middleware
-    \Illuminate\Cookie\Middleware\EncryptCookies::class,
-    \Illuminate\Session\Middleware\StartSession::class,
-    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
-    \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    EncryptCookies::class,
+    StartSession::class,
+    ShareErrorsFromSession::class,
+    PreventRequestForgery::class,
+    SubstituteBindings::class,
 
     // Auth related
-    \Illuminate\Auth\AuthManager::class,
-    \Illuminate\Auth\SessionGuard::class,
-    \Illuminate\Auth\EloquentUserProvider::class,
+    AuthManager::class,
+    SessionGuard::class,
+    EloquentUserProvider::class,
 
     // Queue related
-    \Illuminate\Queue\Worker::class,
-    \Illuminate\Queue\QueueManager::class,
-    \Illuminate\Queue\Jobs\Job::class,
+    Worker::class,
+    QueueManager::class,
+    Job::class,
 
     // Inertia
-    \Inertia\Inertia::class,
-    \Inertia\Response::class,
+    Inertia::class,
+    Response::class,
 ];
 
 function preloadClass($class)
