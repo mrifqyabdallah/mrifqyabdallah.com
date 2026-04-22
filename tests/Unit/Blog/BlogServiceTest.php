@@ -1,9 +1,9 @@
 <?php
 
-use App\Services\BlogSyncService;
+use App\Services\BlogService;
 
 beforeEach(function () {
-    $this->service = new BlogSyncService;
+    $this->service = new BlogService;
 });
 
 describe('parseFilename', function () {

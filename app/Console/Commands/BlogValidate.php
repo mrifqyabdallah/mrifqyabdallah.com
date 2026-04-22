@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\BlogSyncService;
+use App\Services\BlogService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +12,7 @@ class BlogValidate extends Command
 
     protected $description = 'Validate frontmatter and filename format of blog markdown files';
 
-    public function __construct(private readonly BlogSyncService $syncService)
+    public function __construct(private readonly BlogService $blogService)
     {
         parent::__construct();
     }
@@ -66,7 +66,7 @@ class BlogValidate extends Command
                 continue;
             }
 
-            $errors = $this->syncService->validateFrontmatter($filename, $contents);
+            $errors = $this->blogService->validateFrontmatter($filename, $contents);
 
             if (empty($errors)) {
                 $this->line("  ✓ <fg=green>{$filename}</>");
