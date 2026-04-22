@@ -40,6 +40,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN install-php-extensions pcov
+
 RUN groupadd --gid ${GID} devuser \
     && useradd --uid ${UID} --gid ${GID} --create-home --shell /bin/bash devuser \
     && echo "devuser ALL=(root) NOPASSWD: /bin/rm -f /var/run/cron*.pid, /usr/sbin/service cron start" \
