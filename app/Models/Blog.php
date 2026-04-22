@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 /**
  * @method static Builder<Blog> published()
@@ -19,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Blog extends Model
 {
     /** @use HasFactory<BlogFactory> */
-    use HasFactory;
+    use HasFactory, HasSlug;
 
     protected $guarded = [];
 
@@ -28,6 +30,14 @@ class Blog extends Model
         'status' => BlogStatus::class,
         'published_at' => 'date',
     ];
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
+    }
 
     /** @return HasMany<BlogView, $this> */
     public function views(): HasMany

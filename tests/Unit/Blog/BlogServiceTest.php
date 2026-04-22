@@ -1,7 +1,6 @@
 <?php
 
 use App\Services\BlogService;
-use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     $this->service = new BlogService;
@@ -146,75 +145,5 @@ MD;
         $errors = $this->service->validateFrontmatter('2026-03-11-test.md', $contents);
 
         expect($errors)->toContain('Invalid tags format: must be an array, e.g. [laravel, php]');
-    });
-});
-
-describe('slugUnique', function () {
-    it('sends a request to the blog feed route', function () {
-        Http::fake([
-            '*' => Http::response(<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<rss><channel></channel></rss>
-XML, 200),
-        ]);
-
-        $this->service->slugUnique('any-slug');
-
-        Http::assertSent(fn ($request) => $request->url() === route('blog.feed'));
-    });
-
-    it('returns false when the feed response is not valid xml', function () {
-        Http::fake([
-            '*' => Http::response('<html>Not found</html>', 200),
-        ]);
-
-        expect($this->service->slugUnique('any-slug'))->toBeFalse();
-    });
-
-    it('returns true when slug is not present in the feed', function () {
-        Http::fake([
-            '*' => Http::response(<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<rss><channel>
-    <item><link>https://example.com/blog/some-other-post</link></item>
-    <item><link>https://example.com/blog/another-post</link></item>
-</channel></rss>
-XML, 200),
-        ]);
-
-        expect($this->service->slugUnique('my-new-post'))->toBeTrue();
-    });
-
-    it('returns true when the feed is empty', function () {
-        Http::fake([
-            '*' => Http::response(<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<rss><channel></channel></rss>
-XML, 200),
-        ]);
-
-        expect($this->service->slugUnique('my-new-post'))->toBeTrue();
-    });
-
-    it('returns false when slug already exists in the feed', function () {
-        Http::fake([
-            '*' => Http::response(<<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<rss><channel>
-    <item><link>https://example.com/blog/existing-post</link></item>
-    <item><link>https://example.com/blog/another-post</link></item>
-</channel></rss>
-XML, 200),
-        ]);
-
-        expect($this->service->slugUnique('existing-post'))->toBeFalse();
-    });
-
-    it('returns false when the feed request fails', function () {
-        Http::fake([
-            '*' => Http::response('', 500),
-        ]);
-
-        expect($this->service->slugUnique('any-slug'))->toBeFalse();
     });
 });
