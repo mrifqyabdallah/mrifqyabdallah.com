@@ -22,7 +22,7 @@ class BlogFeedController extends Controller
             /** @var array<int, string> $blogTags */
             $blogTags = $blog->tags ?? [];
             $tags = collect($blogTags)
-                ->map(fn ($tag) => "<category>{(string) $tag}</category>")
+                ->map(fn ($tag) => "<category>{$tag}</category>")
                 ->implode("\n      ");
             $excerpt = htmlspecialchars($blog->excerpt, ENT_XML1);
 
