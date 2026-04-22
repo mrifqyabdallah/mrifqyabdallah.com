@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
-class BlogSyncService
+class BlogService
 {
     /**
      * Parse a markdown file into structured data ready for DB upsert.

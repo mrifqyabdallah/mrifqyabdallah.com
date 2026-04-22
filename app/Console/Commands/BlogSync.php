@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\BlogStatus;
 use App\Models\Blog;
-use App\Services\BlogSyncService;
+use App\Services\BlogService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,7 +15,7 @@ class BlogSync extends Command
     protected $description = 'Sync markdown files in resources/blogs/ to the database';
 
     public function __construct(
-        private readonly BlogSyncService $syncService
+        private readonly BlogService $blogService
     ) {
         parent::__construct();
     }
@@ -61,7 +61,7 @@ class BlogSync extends Command
                 continue;
             }
 
-            $data = $this->syncService->parseFile($filename, $contents);
+            $data = $this->blogService->parseFile($filename, $contents);
 
             if (! $data) {
                 $this->warn("  ⚠ Skipped (invalid): {$filename}");
