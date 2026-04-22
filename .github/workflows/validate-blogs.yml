@@ -15,28 +15,9 @@ jobs:
     strategy:
       matrix:
         php-version: ['8.5']
-    services:
-      postgres:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_DB: mrifqyabdallah_test
-          POSTGRES_USER: laravel
-          POSTGRES_PASSWORD: secret
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U laravel -d mrifqyabdallah_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
     env:
-      APP_ENV: testing
-      DB_CONNECTION: pgsql
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_DATABASE: mrifqyabdallah_test
-      DB_USERNAME: laravel
-      DB_PASSWORD: secret
+      APP_URL: https://mrifqyabdallah.com
+      APP_HOST: mrifqyabdallah.com
 
     steps:
       - name: Checkout code
