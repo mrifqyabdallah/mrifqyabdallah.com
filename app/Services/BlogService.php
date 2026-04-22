@@ -6,6 +6,8 @@ use App\Models\Blog;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
 class BlogService
@@ -95,10 +97,8 @@ class BlogService
             return null;
         }
 
-        // Ensure slug is valid kebab-case and unique
-        if (is_null($date) || ! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart) ||
-            Blog::where('slug', $slugPart)->where('source_file', '!=', $filename)->exists()
-        ) {
+        // Ensure slug is valid kebab-case
+        if (is_null($date) || ! preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slugPart)) {
             return null;
         }
 
@@ -118,9 +118,13 @@ class BlogService
     {
         $errors = [];
 
-        // Validate filename format first
-        if (! $this->parseFilename($filename)) {
-            $errors[] = 'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md, and unique)';
+        if (! $parseFilename = $this->parseFilename($filename)) {
+            $errors[] = 'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md)';
+        }
+
+        // new file must have a unique slug
+        if ($parseFilename && Blog::where('source_file', $filename)->doesntExist() && Blog::where('slug', $parseFilename['slug'])->exists()) {
+            $errors[] = 'Slug must be unique';
         }
 
         $document = YamlFrontMatter::parse($contents);
@@ -149,5 +153,27 @@ class BlogService
         }
 
         return $errors;
+    }
+
+    public function slugUnique(string $slug): bool
+    {
+        $request = Http::get(route('blog.feed'));
+
+        if (! $request->ok()) {
+            return false;
+        }
+
+        $content = simplexml_load_string($request->body());
+        if (! $content || is_null($content->channel?->item)) {
+            return false;
+        }
+
+        $feed_links = [];
+
+        foreach ($content->channel->item as $feed) {
+            $feed_links[] = Str::afterLast((string) $feed->link, '/');
+        }
+
+        return ! in_array($slug, $feed_links);
     }
 }

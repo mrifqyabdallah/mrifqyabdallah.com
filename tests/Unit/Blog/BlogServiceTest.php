@@ -1,49 +1,10 @@
 <?php
 
 use App\Services\BlogService;
+use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     $this->service = new BlogService;
-});
-
-describe('parseFilename', function () {
-    it('extracts slug and date from a valid filename', function () {
-        $result = $this->service->parseFilename('2026-03-11-my-first-blog.md');
-
-        expect($result)->toBe([
-            'date' => '2026-03-11',
-            'slug' => 'my-first-blog',
-        ]);
-    });
-
-    it('handles multi-word slugs', function () {
-        $result = $this->service->parseFilename('2026-03-11-laravel-and-react-tips.md');
-
-        expect($result['slug'])->toBe('laravel-and-react-tips');
-        expect($result['date'])->toBe('2026-03-11');
-    });
-
-    it('returns null when filename has no date prefix', function () {
-        expect($this->service->parseFilename('my-first-blog.md'))->toBeNull();
-    });
-
-    it('returns null when date is invalid', function () {
-        expect($this->service->parseFilename('2026-99-99-my-blog.md'))->toBeNull();
-    });
-
-    it('returns null when slug contains uppercase', function () {
-        expect($this->service->parseFilename('2026-03-11-My-Blog.md'))->toBeNull();
-    });
-
-    it('returns null when slug contains spaces', function () {
-        expect($this->service->parseFilename('2026-03-11-my blog.md'))->toBeNull();
-    });
-
-    it('strips directory path when present', function () {
-        $result = $this->service->parseFilename('/some/path/2026-03-11-my-blog.md');
-
-        expect($result['slug'])->toBe('my-blog');
-    });
 });
 
 describe('parseFile', function () {
@@ -99,6 +60,46 @@ MD;
     });
 });
 
+describe('parseFilename', function () {
+    it('extracts slug and date from a valid filename', function () {
+        $result = $this->service->parseFilename('2026-03-11-my-first-blog.md');
+
+        expect($result)->toBe([
+            'date' => '2026-03-11',
+            'slug' => 'my-first-blog',
+        ]);
+    });
+
+    it('handles multi-word slugs', function () {
+        $result = $this->service->parseFilename('2026-03-11-laravel-and-react-tips.md');
+
+        expect($result['slug'])->toBe('laravel-and-react-tips');
+        expect($result['date'])->toBe('2026-03-11');
+    });
+
+    it('returns null when filename has no date prefix', function () {
+        expect($this->service->parseFilename('my-first-blog.md'))->toBeNull();
+    });
+
+    it('returns null when date is invalid', function () {
+        expect($this->service->parseFilename('2026-99-99-my-blog.md'))->toBeNull();
+    });
+
+    it('returns null when slug contains uppercase', function () {
+        expect($this->service->parseFilename('2026-03-11-My-Blog.md'))->toBeNull();
+    });
+
+    it('returns null when slug contains spaces', function () {
+        expect($this->service->parseFilename('2026-03-11-my blog.md'))->toBeNull();
+    });
+
+    it('strips directory path when present', function () {
+        $result = $this->service->parseFilename('/some/path/2026-03-11-my-blog.md');
+
+        expect($result['slug'])->toBe('my-blog');
+    });
+});
+
 describe('validateFrontmatter', function () {
     it('returns no errors for a valid file', function () {
         $contents = <<<'MD'
@@ -122,7 +123,7 @@ MD;
         $errors = $this->service->validateFrontmatter('bad-filename.md', $contents);
 
         expect($errors)->toContain(
-            'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md, and unique)'
+            'Filename must match format: yyyy-mm-dd-title-slug.md (kebab-case slug, e.g. 2026-03-11-my-first-blog.md)'
         );
     });
 
@@ -145,5 +146,75 @@ MD;
         $errors = $this->service->validateFrontmatter('2026-03-11-test.md', $contents);
 
         expect($errors)->toContain('Invalid tags format: must be an array, e.g. [laravel, php]');
+    });
+});
+
+describe('slugUnique', function () {
+    it('sends a request to the blog feed route', function () {
+        Http::fake([
+            '*' => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss><channel></channel></rss>
+XML, 200),
+        ]);
+
+        $this->service->slugUnique('any-slug');
+
+        Http::assertSent(fn ($request) => $request->url() === route('blog.feed'));
+    });
+
+    it('returns false when the feed response is not valid xml', function () {
+        Http::fake([
+            '*' => Http::response('<html>Not found</html>', 200),
+        ]);
+
+        expect($this->service->slugUnique('any-slug'))->toBeFalse();
+    });
+
+    it('returns true when slug is not present in the feed', function () {
+        Http::fake([
+            '*' => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss><channel>
+    <item><link>https://example.com/blog/some-other-post</link></item>
+    <item><link>https://example.com/blog/another-post</link></item>
+</channel></rss>
+XML, 200),
+        ]);
+
+        expect($this->service->slugUnique('my-new-post'))->toBeTrue();
+    });
+
+    it('returns true when the feed is empty', function () {
+        Http::fake([
+            '*' => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss><channel></channel></rss>
+XML, 200),
+        ]);
+
+        expect($this->service->slugUnique('my-new-post'))->toBeTrue();
+    });
+
+    it('returns false when slug already exists in the feed', function () {
+        Http::fake([
+            '*' => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss><channel>
+    <item><link>https://example.com/blog/existing-post</link></item>
+    <item><link>https://example.com/blog/another-post</link></item>
+</channel></rss>
+XML, 200),
+        ]);
+
+        expect($this->service->slugUnique('existing-post'))->toBeFalse();
+    });
+
+    it('returns false when the feed request fails', function () {
+        Http::fake([
+            '*' => Http::response('', 500),
+        ]);
+
+        expect($this->service->slugUnique('any-slug'))->toBeFalse();
     });
 });
