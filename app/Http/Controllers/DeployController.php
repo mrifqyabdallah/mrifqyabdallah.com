@@ -14,6 +14,6 @@ class DeployController extends Controller
     {
         DeployApp::dispatch();
 
-        return response()->json(['ok' => true]);
+        return response()->noContent();
     }
 }

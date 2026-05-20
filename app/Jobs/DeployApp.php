@@ -23,8 +23,13 @@ class DeployApp implements ShouldQueue
      */
     public function handle(): void
     {
-        $output = shell_exec('cd /srv/mrifqyabdallah.com && make server.deploy 2>&1');
+        $output = $this->executeDeploy();
 
         Log::info('Deployment finished', ['output' => $output]);
+    }
+
+    protected function executeDeploy(): ?string
+    {
+        return shell_exec('cd /srv/mrifqyabdallah.com && make server.deploy 2>&1');
     }
 }
