@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 
 class DeployApp implements ShouldQueue
 {
@@ -23,13 +24,8 @@ class DeployApp implements ShouldQueue
      */
     public function handle(): void
     {
-        $output = $this->executeDeploy();
+        $result = Process::run('make -C /srv/mrifqyabdallah.com server.deploy');
 
-        Log::info('Deployment finished', ['output' => $output]);
-    }
-
-    protected function executeDeploy(): ?string
-    {
-        return shell_exec('cd /srv/mrifqyabdallah.com && make server.deploy 2>&1');
+        Log::info('Deployment finished', ['output' => trim($result->output())]);
     }
 }
