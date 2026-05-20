@@ -52,6 +52,23 @@ dev.init:
 	@echo ""
 	@echo "✓ Done! Your app is running at $$(grep '^APP_URL=' .env | cut -d '=' -f2)"
 
+# =============================================================================
+# Deploy new version
+# =============================================================================
+
+server.deploy:
+	@echo "Deploying..."
+	git fetch origin main
+	git checkout origin/main -- docker-compose.prod.yml
+	cp docker-compose.prod.yml docker-compose.yml
+	docker compose pull
+	docker compose up -d
+	docker compose exec -T app php artisan migrate --force
+	docker compose exec -T app php artisan blog:sync
+	docker compose exec -T app php artisan sitemap:generate
+	docker compose exec -T app php artisan cloudflare:waf-rule --sync
+	docker image prune -f
+	@echo "✓ Deployed"
 
 # =============================================================================
 # Docker compose

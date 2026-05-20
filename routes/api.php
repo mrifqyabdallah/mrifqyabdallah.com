@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\DeployController;
+use App\Http\Middleware\ValidateDeployToken;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/deploy', DeployController::class)
+    ->middleware(ValidateDeployToken::class);

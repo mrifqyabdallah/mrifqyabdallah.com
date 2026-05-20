@@ -64,21 +64,9 @@ jobs:
     needs: [build]
     runs-on: ubuntu-24.04
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /app
-            git fetch origin main
-            git checkout origin/main -- docker-compose.prod.yml
-            cp docker-compose.prod.yml docker-compose.yml
-            docker compose pull
-            docker compose up -d
-            docker compose exec -T app php artisan migrate --force
-            docker compose exec -T app php artisan blog:sync
-            docker compose exec -T app php artisan sitemap:generate
-            docker compose exec -T app php artisan cloudflare:waf-rule --sync
-            docker image prune -f
+      - name: Trigger deployment
+        run: |
+          curl -X POST https://mrifqyabdallah.com/api/deploy \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -f
