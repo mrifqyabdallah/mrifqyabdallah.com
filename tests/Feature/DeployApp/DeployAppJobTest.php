@@ -3,8 +3,13 @@
 use App\Jobs\DeployApp;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 
 it('runs the deploy command and logs output', function () {
+    Process::fake([
+        'make -C /srv/mrifqyabdallah.com server.deploy' => Process::result('Deployed successfully'),
+    ]);
+
     $logged = [];
 
     Log::listen(function (MessageLogged $event) use (&$logged) {
@@ -15,15 +20,9 @@ it('runs the deploy command and logs output', function () {
         ];
     });
 
-    $job = new class extends DeployApp
-    {
-        protected function executeDeploy(): ?string
-        {
-            return 'Deployed successfully';
-        }
-    };
+    (new DeployApp)->handle();
 
-    $job->handle();
+    Process::assertRan('make -C /srv/mrifqyabdallah.com server.deploy');
 
     expect($logged)->toHaveCount(1)
         ->and($logged[0]['level'])->toBe('info')
