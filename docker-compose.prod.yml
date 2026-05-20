@@ -6,8 +6,7 @@ services:
   app:
     image: ghcr.io/${GITHUB_REPOSITORY:-mrifqyabdallah/mrifqyabdallah.com}:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:8001:8000"
     environment:
       APP_NAME: mrifqyabdallah
       APP_ENV: production
@@ -21,6 +20,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD}
       APP_HOST: ${APP_HOST:-mrifqyabdallah.com}
+      SERVER_NAME: ":8000"
       CFCACHE_API_TOKEN: ${CFCACHE_API_TOKEN}
       CFCACHE_ZONE_ID: ${CFCACHE_ZONE_ID}
       ACME_EMAIL: ${ACME_EMAIL}
