@@ -1,9 +1,8 @@
 {
     admin off
-    email {$ACME_EMAIL}
 }
 
-{$APP_HOST}, www.{$APP_HOST} {
+{$SERVER_NAME} {
     root * /app/public
     php_server
     file_server
