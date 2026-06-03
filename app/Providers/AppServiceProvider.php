@@ -2,16 +2,19 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\SecureHeaders;
 use App\Policies\StatsPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Events\ScheduledBackgroundTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -33,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configurePolicies();
         $this->configureSchedule();
+        $this->configureSecureUrls();
     }
 
     protected function configureDefaults(): void
@@ -74,5 +78,19 @@ class AppServiceProvider extends ServiceProvider
                 'exception' => $event->exception->getMessage(),
             ]);
         });
+    }
+
+    protected function configureSecureUrls(): void
+    {
+        $enforceHttps = $this->app->environment(['production'])
+            && ! $this->app->runningUnitTests();
+
+        URL::forceHttps($enforceHttps);
+
+        if ($enforceHttps) {
+            request()->server->set('HTTPS', 'on');
+            $this->app->make(Router::class)
+                ->pushMiddlewareToGroup('web', SecureHeaders::class);
+        }
     }
 }
