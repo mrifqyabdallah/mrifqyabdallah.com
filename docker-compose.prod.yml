@@ -20,12 +20,11 @@ services:
       DB_USERNAME: ${DB_USERNAME:-laravel}
       DB_PASSWORD: ${DB_PASSWORD}
       APP_HOST: ${APP_HOST:-mrifqyabdallah.com}
-      SERVER_NAME: ":8000"
       CFCACHE_API_TOKEN: ${CFCACHE_API_TOKEN}
       CFCACHE_ZONE_ID: ${CFCACHE_ZONE_ID}
-      ACME_EMAIL: ${ACME_EMAIL}
       PHP_INI_SCAN_DIR: /usr/local/etc/php/conf.d
       LOG_STACK: ${LOG_STACK:-daily}
+      APP_DEPLOY_TOKEN: ${APP_DEPLOY_TOKEN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,6 +91,5 @@ networks:
 
 volumes:
   postgres_data:
-  caddy_data:
   storage_app:
   storage_logs:
