@@ -66,7 +66,7 @@ jobs:
     steps:
       - name: Trigger deployment
         run: |
-          curl -X POST https://mrifqyabdallah.com/api/deploy \
+          curl -X POST https://hooks.mrifqyabdallah.com/hooks/deploy-mrifqyabdallah \
             -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
             -H "Content-Type: application/json" \
             -f
