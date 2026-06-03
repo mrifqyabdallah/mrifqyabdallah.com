@@ -123,15 +123,4 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Deployment Token
-    |--------------------------------------------------------------------------
-    |
-    | Auth token for the deployment hook.
-    |
-    */
-
-    'deploy_token' => env('APP_DEPLOY_TOKEN'),
-
 ];
