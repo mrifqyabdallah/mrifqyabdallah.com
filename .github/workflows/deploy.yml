@@ -68,5 +68,6 @@ jobs:
         run: |
           curl -X POST https://hooks.mrifqyabdallah.com/hooks/deploy-mrifqyabdallah \
             -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
+            -H "X-CF-MRACOM: ${{ secrets.CF_MRACOM }}" \
             -H "Content-Type: application/json" \
             -f
