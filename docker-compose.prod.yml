@@ -33,7 +33,7 @@ services:
       - storage_logs:/app/storage/logs
     entrypoint: ["/entrypoint.sh"]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/up || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/up || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
